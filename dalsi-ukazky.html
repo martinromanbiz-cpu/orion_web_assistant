@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Další ukázky — Orion</title>
+  <meta name="description" content="Odkazy na další demo projekty." />
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="container topbarInner">
+      <div class="badges">
+        <span class="badge">AI chatbot • ukázka</span>
+        <span class="badge">Workflows & automatizace</span>
+        <span class="badge">Pro firmy</span>
+      </div>
+      <div>Martin Roman · kontakt přes formulář</div>
+    </div>
+  </div>
+
+  <header class="header">
+    <div class="container headerInner">
+      <a class="brand" href="./index.html" aria-label="Web assistant Orion">
+        <div class="brandMark" aria-hidden="true"></div>
+        <div class="brandText">
+          <strong>Web assistant Orion</strong>
+          <span>Prezentační ukázka pro firmy</span>
+        </div>
+      </a>
+
+      <nav class="nav" aria-label="Navigace">
+        <a href="./index.html">Home</a>
+        <a href="./web-assistant.html">Web assistant</a>
+        <a href="./jak-to-funguje.html">Jak to funguje</a>
+        <a href="./dalsi-ukazky.html">Další ukázky</a>
+        <a href="./kontakt.html">Kontakt</a>
+      </nav>
+
+      <div class="headerRight">
+        <button class="btn btnPrimary" type="button" onclick="window.openChat && window.openChat()">Otevřít ukázku</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="hero">
+        <div class="kicker">Další ukázky • odkazy + krátký popis</div>
+        <h2 class="h2">Další ukázky</h2>
+        <p class="small">Odkazy se otevírají v novém tabu. Slouží jen jako doplněk k hlavnímu Web assistant Orion.</p>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Demo e-shop (starší ukázka)</h3>
+          <p>Jednoduchý demo web ve stylu e-shopu, který ukazuje chat v kontextu produktů/FAQ.</p>
+          <div class="heroActions">
+            <a class="btn" href="#" target="_blank" rel="noopener">Otevřít (doplnit odkaz)</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Demo hotel (starší ukázka)</h3>
+          <p>Ukázka jiného kontextu. Slouží hlavně jako reference UI a struktury, ne jako finální směr.</p>
+          <div class="heroActions">
+            <a class="btn" href="#" target="_blank" rel="noopener">Otevřít (doplnit odkaz)</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="notice" style="margin-top:14px">
+        <strong>Poznámka</strong>
+        Později tyto odkazy nahradíš reálnými URL.
+      </div>
+
+      <footer class="footer">
+        <div class="container footerGrid">
+          <div>
+            <strong>Web assistant Orion</strong>
+            <div class="small">Prezentační web · ukázka AI chatbota a workflow pro firmy</div>
+          </div>
+          <div>
+            <div><strong>Menu</strong></div>
+            <div class="small">
+              <a href="./index.html">Home</a> ·
+              <a href="./web-assistant.html">Web assistant</a> ·
+              <a href="./jak-to-funguje.html">Jak to funguje</a> ·
+              <a href="./dalsi-ukazky.html">Další ukázky</a> ·
+              <a href="./kontakt.html">Kontakt</a>
+            </div>
+          </div>
+          <div>
+            <div><strong>Důležité</strong></div>
+            <div class="small">Toto není prodejní e-shop. Je to prezentační ukázka funkcí chatbota pro web/e-shop.</div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </main>
+
+  <div id="chatHint">Podpora • ukázka</div>
+  <button id="chatFab" aria-label="Otevřít chat" type="button">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M21 12c0 4.418-4.03 8-9 8-1.097 0-2.148-.173-3.12-.49L3 21l1.62-4.05A7.36 7.36 0 0 1 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8Z"
+        stroke="white" stroke-width="2" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <div id="chatPanel" role="dialog" aria-label="Chat">
+    <div class="chatHeader">
+      <div>
+        <strong>Web assistant Orion</strong>
+        <span>Rychlá prezentační ukázka (web / e-shop / workflow)</span>
+      </div>
+      <button class="chatClose" id="chatClose" aria-label="Zavřít" type="button">✕</button>
+    </div>
+    <div class="chatBody" id="chatBody"></div>
+    <div class="chatFooter">
+      <input id="chatInput" type="text" placeholder="Napište dotaz…" />
+      <button id="chatSend" type="button">Odeslat</button>
+    </div>
+  </div>
+
+  <script src="./assets/config.js"></script>
+  <script src="./assets/utils.js"></script>
+  <script src="./assets/base.js"></script>
+  <script src="./assets/chat.js"></script>
+</body>
+</html>
