@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Ukázky – Orion</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="assets/css/styles.css"/>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container">
+    <div class="nav">
+      <a class="brand" href="index.html">
+        <img class="mark" src="assets/img/orion-mark.svg" alt="Orion"/>
+        <span>Martin Roman</span>
+      </a>
+      <nav class="menu">
+        <a data-nav href="index.html">Domů</a>
+        <a data-nav href="web-assistant.html">Web Assistant</a>
+        <a data-nav href="jak-to-funguje.html">Jak to funguje</a>
+        <a data-nav href="ukazky.html">Ukázky</a>
+        <a data-nav href="kontakt.html">Kontakt</a>
+      </nav>
+      <div class="cta">
+        <a class="btn primary" href="web-assistant.html">Vyzkoušet Orion →</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="pageHead">
+    <h1>Další ukázky</h1>
+    <p>Odkazy na předchozí demo weby. Otevřou se v novém panelu.</p>
+  </div>
+
+  <section class="section">
+    <div class="split" data-demo-list>
+      <!-- plní se z config.js -->
+    </div>
+  </section>
+
+  <div class="spacer"></div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footerInner">
+      <div>© <span id="y"></span> Martin Roman</div>
+      <div>Ukázky • GitHub Pages</div>
+    </div>
+  </div>
+</footer>
+
+<script>document.getElementById("y").textContent = new Date().getFullYear();</script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
