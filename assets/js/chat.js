@@ -1,148 +1,150 @@
+// assets/js/chat.js
 (function(){
   const cfg = window.ORION_CONFIG || {};
-  const chatFab = document.getElementById("chatFab");
-  const chatPanel = document.getElementById("chatPanel");
-  const chatClose = document.getElementById("chatClose");
-  const chatBody = document.getElementById("chatBody");
-  const chatInput = document.getElementById("chatInput");
-  const chatSend = document.getElementById("chatSend");
-  const chatHint = document.getElementById("chatHint");
-  if(!chatFab || !chatPanel) return;
+  const webhook = cfg.N8N_WEBHOOK_URL;
 
-  let hintTimer = null;
-  function showHint(){
-    if(!chatHint) return;
-    chatHint.classList.add("show");
-    clearTimeout(hintTimer);
-    hintTimer = setTimeout(()=> chatHint.classList.remove("show"), 2600);
+  const fab = document.querySelector("[data-chat-fab]");
+  const panel = document.querySelector("[data-chat-panel]");
+  const closeBtn = document.querySelector("[data-chat-close]");
+  const body = document.querySelector("[data-chat-body]");
+  const input = document.querySelector("[data-chat-input]");
+  const send = document.querySelector("[data-chat-send]");
+  const quickWrap = document.querySelector("[data-chat-quick]");
+
+  if(!fab || !panel || !body || !input || !send) return;
+
+  const sessionKey = "orion_session_id";
+  const historyKey = "orion_history";
+  const sessionId = localStorage.getItem(sessionKey) || cryptoRandomId();
+  localStorage.setItem(sessionKey, sessionId);
+
+  let history = safeJson(localStorage.getItem(historyKey), []);
+  if(!Array.isArray(history)) history = [];
+
+  function open(){
+    panel.classList.add("open");
+    input.focus();
+    if(body.children.length === 0){
+      // Úvodní zpráva + quick replies (fixní)
+      bot(`Dobrý den, jsem Orion — webový asistent v prezentační ukázce. Napište dotaz, nebo klikněte na jednu z možností níže.`);
+      renderQuick([
+        "Kolik to stojí?",
+        "Co umí webový asistent?",
+        "Jak to funguje?",
+        "Dá se to nasadit na můj web?",
+        "Co když se někdo ptá mimo téma?",
+        "Chci nezávaznou konzultaci"
+      ]);
+    }
   }
-  setTimeout(showHint, 900);
+  function close(){ panel.classList.remove("open"); }
 
-  function openChat(){
-    chatPanel.classList.add("open");
-    chatInput && chatInput.focus();
-    showHint();
-  }
-  function closeChat(){ chatPanel.classList.remove("open"); }
+  fab.addEventListener("click", ()=> panel.classList.contains("open") ? close() : open());
+  closeBtn && closeBtn.addEventListener("click", close);
 
-  chatFab.addEventListener("click", openChat);
-  chatClose && chatClose.addEventListener("click", closeChat);
+  send.addEventListener("click", onSend);
+  input.addEventListener("keydown", (e)=>{ if(e.key==="Enter") onSend(); });
 
-  function addMsg(role, text){
-    const row = document.createElement("div");
-    row.className = "msg " + (role === "user" ? "user" : "bot");
-    const bubble = document.createElement("div");
-    bubble.className = "bubble";
-    bubble.textContent = text;
-    row.appendChild(bubble);
-    chatBody.appendChild(row);
-    chatBody.scrollTop = chatBody.scrollHeight;
+  function onSend(){
+    const text = input.value.trim();
+    if(!text) return;
+    input.value = "";
+    user(text);
+    renderQuick([]); // po odeslání schovej quick replies
+    ask(text);
   }
 
-  function addQuickReplies(options){
-    if(!options || !options.length) return;
-    const wrap = document.createElement("div");
-    wrap.className = "quick";
-    options.slice(0,10).forEach(label => {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.textContent = label;
-      b.addEventListener("click", ()=>{ chatInput.value = label; send(); });
-      wrap.appendChild(b);
+  function user(text){
+    body.insertAdjacentHTML("beforeend", `<div class="msg user">${escapeHtml(text)}</div>`);
+    scrollDown();
+  }
+  function bot(text){
+    body.insertAdjacentHTML("beforeend", `<div class="msg bot">${escapeHtml(text)}</div>`);
+    scrollDown();
+  }
+  function renderQuick(items){
+    if(!quickWrap) return;
+    if(!items || !items.length){
+      quickWrap.innerHTML = "";
+      return;
+    }
+    quickWrap.innerHTML = `<div class="quick">${
+      items.map(t=>`<button class="pill" type="button">${escapeHtml(t)}</button>`).join("")
+    }</div>`;
+    quickWrap.querySelectorAll(".pill").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        input.value = btn.textContent;
+        onSend();
+      });
     });
-    chatBody.appendChild(wrap);
-    chatBody.scrollTop = chatBody.scrollHeight;
   }
 
-  // Intro only once
-  const introKey = "orion_intro_done";
-  if(!localStorage.getItem(introKey)){
-    const badge = document.createElement("div");
-    badge.className = "chatBadge";
-    badge.innerHTML = `<span class="codeTag">${cfg.BRAND_NAME || "Orion"}</span><span>${cfg.MODE_BADGE || "PREZENTAČNÍ UKÁZKA"}</span>`;
-    chatBody.appendChild(badge);
+  async function ask(text){
+    if(!webhook){
+      bot("Webhook není nastavený. Doplňte ho do assets/js/config.js a zkuste to znovu.");
+      return;
+    }
 
-    addMsg("bot",
-      "Dobrý den, jsem Web assistant Orion. Tohle je prezentační ukázka pro firmy — ptejte se na web/e-shop asistenta, možnosti workflow, nasazení nebo orientační cenové balíčky."
-    );
+    // history: udržuj krátké (kvůli tokenům)
+    const compactHistory = history.slice(-10);
 
-    addQuickReplies([
-      "Co všechno chatbot umí?",
-      "Pro jaké firmy se to hodí?",
-      "Jak probíhá nasazení na web?",
-      "Jaké jsou cenové balíčky?",
-      "Chci ukázku pro e-shop"
-    ]);
-
-    localStorage.setItem(introKey, "1");
-  }
-
-  async function callN8n(userText){
-    const url = (cfg.N8N_WEBHOOK_URL || "").trim();
-    if(!url) return { text: "Chybí URL na n8n webhook. Upravte assets/config.js (N8N_WEBHOOK_URL).", quick_replies: [] };
-
-    const sessionId = orionGetSessionId();
-    const history = orionLoadHistory();
-
-    // Payload: chatInput + sessionId + history (připravené pro tvůj workflow)
     const payload = {
-      chatInput: userText,
+      chatInput: text,
       sessionId,
-      history,
-      meta: { source:"orion-demo-site", page:location.pathname, ts:new Date().toISOString() }
+      history: compactHistory,
+      meta: {
+        source: "orion_web_assistant",
+        page: window.location.pathname
+      }
     };
 
-    const res = await fetch(url, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    const data = await res.json().catch(()=> ({}));
-    const text = orionExtractText(data) || "Rozumím. Upřesněte prosím web vs e-shop a co má asistent řešit.";
-    const quick = orionExtractQuickReplies(data);
-
-    const nextHistory = history.concat([
-      { role:"user", content:userText, ts: Date.now() },
-      { role:"assistant", content:text, ts: Date.now() }
-    ]);
-    orionSaveHistory(nextHistory);
-
-    return { text, quick_replies: quick };
-  }
-
-  let sending = false;
-  async function send(){
-    const text = (chatInput.value || "").trim();
-    if(!text || sending) return;
-    sending = true;
-    chatInput.value = "";
-    addMsg("user", text);
-
-    const typingRow = document.createElement("div");
-    typingRow.className = "msg bot";
-    const typingBubble = document.createElement("div");
-    typingBubble.className = "bubble muted";
-    typingBubble.textContent = "Přemýšlím…";
-    typingRow.appendChild(typingBubble);
-    chatBody.appendChild(typingRow);
-    chatBody.scrollTop = chatBody.scrollHeight;
-
     try{
-      const out = await callN8n(text);
-      typingBubble.textContent = out.text;
-      addQuickReplies(out.quick_replies);
-    }catch(e){
-      typingBubble.textContent = "Došlo k chybě při volání ukázky. Zkuste to prosím znovu.";
-    }finally{
-      sending = false;
-      chatBody.scrollTop = chatBody.scrollHeight;
+      const res = await fetch(webhook, {
+        method:"POST",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json().catch(()=> ({}));
+
+      // n8n chat trigger obvykle vrací { output: "..." } nebo přímo string.
+      const answer =
+        (typeof data === "string" && data) ||
+        data.output ||
+        data.text ||
+        data.answer ||
+        data.message ||
+        JSON.stringify(data);
+
+      // ulož do historie pro další dotazy
+      history.push({ role:"user", content:text });
+      history.push({ role:"assistant", content: String(answer) });
+      localStorage.setItem(historyKey, JSON.stringify(history.slice(-30)));
+
+      bot(String(answer));
+    } catch(e){
+      bot("Teď se nepovedlo ukázku doručit. Zkuste to prosím znovu, nebo napište dotaz jinak (web/e-shop scénář).");
     }
   }
 
-  chatSend.addEventListener("click", send);
-  chatInput.addEventListener("keydown", (e)=>{ if(e.key === "Enter") send(); });
-
-  // hook for header button
-  window.openChat = openChat;
+  function scrollDown(){ body.scrollTop = body.scrollHeight; }
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;");
+  }
+  function safeJson(s, fallback){
+    try{ return JSON.parse(s); } catch { return fallback; }
+  }
+  function cryptoRandomId(){
+    // jednoduché ID i bez crypto supportu
+    if(window.crypto && crypto.getRandomValues){
+      const a = new Uint32Array(4);
+      crypto.getRandomValues(a);
+      return Array.from(a).map(n=>n.toString(16)).join("");
+    }
+    return Math.random().toString(16).slice(2) + Date.now().toString(16);
+  }
 })();
