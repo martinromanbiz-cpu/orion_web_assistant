@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kontakt | Web assistant Orion</title>
+  <meta name="description" content="Nezávazná poptávka / konzultace k webovému asistentovi Orion." />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/contact.css" />
+  <script defer src="assets/js/config.js"></script>
+  <script defer src="assets/js/contact.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container nav">
+      <a class="brand" href="index.html" aria-label="Orion – domů">
+        <img src="assets/img/orion-mark.svg" alt="Orion" class="brand__logo" />
+        <span class="brand__name">Web assistant <strong>Orion</strong></span>
+      </a>
+      <nav class="nav__links" aria-label="Hlavní menu">
+        <a href="web-assistant.html">Ukázka (chat)</a>
+        <a href="jak-to-funguje.html">Jak to funguje</a>
+        <a href="ukazky.html">Ukázky</a>
+        <a href="dalsi-ukazky.html">Další ukázky</a>
+        <a class="btn btn--sm" href="kontakt.html">Kontakt</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="page-hero">
+      <div>
+        <span class="badge">PREZENTACE</span>
+        <h1 class="h1">Nezávazná konzultace</h1>
+        <p class="lead">Krátce popište, co chcete na webu/e-shopu zlepšit. Ozvu se s návrhem dalších kroků.</p>
+      </div>
+    </section>
+
+    <section class="grid grid--2">
+      <div class="card">
+        <div class="card__header">
+          <h2 class="h2">Formulář</h2>
+          <p class="muted">Odeslání zabere cca 30 sekund.</p>
+        </div>
+        <div class="card__content">
+          <form id="contact-form" class="contact-form" novalidate>
+            <div class="field">
+              <label for="name">Jméno</label>
+              <input id="name" name="name" type="text" autocomplete="name" required placeholder="Např. Jan Novák" />
+            </div>
+            <div class="field">
+              <label for="email">E-mail</label>
+              <input id="email" name="email" type="email" autocomplete="email" required placeholder="např. jan@firma.cz" />
+            </div>
+            <div class="field">
+              <label for="phone">Telefon (volitelné)</label>
+              <input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="+420 …" />
+            </div>
+            <div class="field">
+              <label for="message">Zpráva</label>
+              <textarea id="message" name="message" rows="5" required placeholder="Co by měl asistent řešit nejčastěji? (např. dotazy k produktům, doprava, vrácení…)" ></textarea>
+            </div>
+            <div class="actions">
+              <button class="btn" type="submit">Odeslat</button>
+              <span id="contact-status" class="status" aria-live="polite"></span>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <aside class="card">
+        <div class="card__header">
+          <h2 class="h2">Co dostanete zpět</h2>
+          <p class="muted">Bez technických termínů. Konkrétně a k věci.</p>
+        </div>
+        <div class="card__content">
+          <ul class="list">
+            <li>návrh scénářů (co má asistent řešit)</li>
+            <li>návrh stylu odpovědí + hranice témat</li>
+            <li>orientační balíček ceny (range) + další krok</li>
+          </ul>
+          <div class="callout">
+            <strong>Poznámka:</strong> Tohle je prezentační web. Formulář slouží pro kontaktování ohledně spolupráce.
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <span class="muted">© <span id="year"></span> Web assistant Orion</span>
+      <span class="muted">PREZENTACE – demo web</span>
+    </div>
+  </footer>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
