@@ -1,26 +1,30 @@
+<!-- kontakt.html (nahraď celý soubor tímto) -->
 <!doctype html>
 <html lang="cs">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Orion – Kontakt</title>
-  <meta name="description" content="Kontaktujte nás ohledně nasazení AI webového asistenta Orion na váš web nebo e‑shop." />
+  <meta name="description" content="Kontaktujte nás ohledně nasazení AI webového asistenta Orion na váš web nebo e-shop." />
 
-  <link rel="stylesheet" href="assets/css/styles.css" />
-  <link rel="stylesheet" href="assets/css/contact.css" />
+  <!-- CSS (podle toho, co máš teď v rootu repo) -->
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="contact.css" />
 </head>
+
 <body>
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="index.html" aria-label="Orion domů">
-        <img src="assets/images/orion-mark.svg" alt="Orion" width="28" height="28" />
+        <!-- logo v rootu (proto ti to dřív padalo, protože HTML mířilo do assets/) -->
+        <img src="orion-mark.svg" alt="Orion" width="28" height="28" />
         <span>Orion</span>
         <span class="badge">DEMO</span>
       </a>
 
       <nav class="nav" aria-label="Hlavní menu">
         <a href="web-assistant.html">Web assistant</a>
-        <a href="jaktofunguje.html">Jak to funguje</a>
+        <a href="jak-to-funguje.html">Jak to funguje</a>
         <a href="ukazky.html">Ukázky</a>
         <a href="kontakt.html" class="active">Kontakt</a>
       </nav>
@@ -32,14 +36,15 @@
   <main class="container page">
     <section class="page-hero">
       <h1>Kontakt</h1>
-      <p class="muted">Pošlete zprávu — demo formulář odešle požadavek do n8n a my se ozveme.</p>
+      <p class="muted">Stačí e-mail a zpráva. Formulář odešle požadavek do n8n.</p>
     </section>
 
     <section class="contact-grid">
       <div class="card">
         <h2>Kontaktujte nás</h2>
-        <p class="muted">Vyplňte krátce, co potřebujete. Stačí e-mail a zpráva.</p>
+        <p class="muted">Ozveme se co nejdříve.</p>
 
+        <!-- FORM: musí sedět IDčka pro contact.js -->
         <form id="orionContactForm" class="contact-form" novalidate>
           <div class="field">
             <label for="name">Jméno</label>
@@ -58,7 +63,7 @@
 
           <div class="field">
             <label for="message">Zpráva <span aria-hidden="true">*</span></label>
-            <textarea id="message" name="message" rows="6" placeholder="Co má Orion na vašem webu/e‑shopu řešit?" required></textarea>
+            <textarea id="message" name="message" rows="6" placeholder="Co má Orion na vašem webu/e-shopu řešit?" required></textarea>
           </div>
 
           <div class="actions">
@@ -73,47 +78,44 @@
       <aside class="card contact-side">
         <h2>Co obvykle řešíme</h2>
         <ul class="list">
-          <li>Chatbot pro e‑shop: FAQ, doprava/platby, stav objednávky.</li>
+          <li>E-shop: FAQ, doprava/platby, produkty, skladovost.</li>
           <li>Firemní web: kvalifikace leadů, směrování poptávek.</li>
-          <li>Integrace: formuláře, CRM/e‑mail, automatizace v n8n.</li>
+          <li>Integrace: formuláře, e-mail, CRM, automatizace v n8n.</li>
         </ul>
-        <p class="muted">Cenu řešíme individuálně podle rozsahu. Nejrychlejší je krátká konzultace.</p>
+        <p class="muted">Cenu řešíme individuálně podle rozsahu — nejrychlejší je krátká konzultace.</p>
       </aside>
     </section>
   </main>
 
-  <!-- Chat modal (sdílené) -->
-  <div class="chat-modal" id="chatModal" aria-hidden="true">
-    <div class="chat-modal__backdrop" id="chatBackdrop"></div>
-    <div class="chat-modal__panel" role="dialog" aria-modal="true" aria-label="Orion chat">
-      <div class="chat-header">
-        <div>
-          <strong>Orion</strong>
-          <div class="muted" style="font-size:12px;">Demo webový asistent</div>
-        </div>
-        <button class="btn btn-ghost" id="closeChatBtn" type="button">Zavřít</button>
+  <!-- Success modal (contact.js ho používá, když existuje) -->
+  <div id="contactModal" class="modal" hidden aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
+      <div class="modal-head">
+        <h3 id="contactModalTitle">Hotovo</h3>
+        <button id="contactClose" class="icon-btn" type="button" aria-label="Zavřít">✕</button>
       </div>
-
-      <div class="chat-body" id="chatMessages"></div>
-
-      <div class="chat-quick" id="quickReplies"></div>
-
-      <form class="chat-input" id="chatForm">
-        <input id="chatInput" type="text" placeholder="Napište dotaz…" autocomplete="off" />
-        <button class="btn btn-primary" type="submit">Odeslat</button>
-      </form>
-
-      <div class="chat-footer muted">
-        Tohle je demo. Odpovědi jsou zaměřené na web/e‑shop asistenta.
+      <p class="muted">Děkuji, zpráva byla odeslána. Ozveme se co nejdříve.</p>
+      <div class="modal-actions">
+        <button id="contactClose2" class="btn btn-primary" type="button">Zavřít</button>
       </div>
     </div>
   </div>
 
-  <!-- Skripty: config musí být před chat.js a contact.js -->
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/utils.js"></script>
-  <script src="assets/js/app.js"></script>
-  <script src="assets/js/chat.js"></script>
-  <script src="assets/js/contact.js"></script>
+  <!-- JS (podle toho, co máš teď v rootu repo) -->
+  <script src="config.js"></script>
+  <script src="utils.js"></script>
+  <script src="chat.js"></script>
+  <script src="app.js"></script>
+  <script src="contact.js"></script>
+
+  <script>
+    // aby šel zavřít modal i druhým tlačítkem (contact.js typicky poslouchá #contactClose)
+    (function(){
+      const c2 = document.getElementById("contactClose2");
+      const c1 = document.getElementById("contactClose");
+      if (c2 && c1) c2.addEventListener("click", () => c1.click());
+    })();
+  </script>
 </body>
 </html>
