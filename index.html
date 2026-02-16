@@ -1,4 +1,3 @@
-<!-- index.html -->
 <!doctype html>
 <html lang="cs">
 <head>
@@ -7,48 +6,50 @@
   <title>Orion – AI Web Assistant (demo)</title>
   <meta name="description" content="Prezentační ukázka AI webového asistenta pro weby a e-shopy." />
   <link rel="stylesheet" href="./assets/css/styles.css" />
+
+  <script src="./assets/js/config.js"></script>
   <script src="./assets/js/app.js" defer></script>
+  <script src="./assets/js/chat.js" defer></script>
 </head>
 <body>
+  <div id="siteHeader"></div>
 
-<div id="siteHeader"></div>
+  <main class="container page">
+    <section class="hero">
+      <div class="heroText">
+        <div class="pill">Prezentační ukázka • web/e-shop scénáře</div>
+        <h1>Orion — AI Web Assistant</h1>
+        <p class="muted">
+          Ukázka asistenta pro weby a e-shopy: krátké odpovědi, jasné hranice tématu a vedení k dalšímu kroku (kontakt/konzultace).
+        </p>
 
-<main class="container page">
-  <section class="hero">
-    <div class="heroText">
-      <div class="pill">Prezentační ukázka • web/e-shop scénáře</div>
-      <h1>Orion — AI Web Assistant</h1>
-      <p class="muted">
-        Ukázka asistenta pro weby a e-shopy: krátké odpovědi, jasné hranice tématu, a vedení k dalšímu kroku (kontakt/konzultace).
-      </p>
+        <div class="heroActions">
+          <a class="btn btn-primary" href="./web-assistant.html">Vyzkoušet demo</a>
+          <a class="btn" href="./jak-to-funguje.html">Jak to funguje</a>
+        </div>
 
-      <div class="heroActions">
-        <a class="btn btn-primary" href="./web-assistant.html">Vyzkoušet demo</a>
-        <a class="btn" href="./jak-to-funguje.html">Jak to funguje</a>
+        <div class="heroGrid">
+          <div class="card">
+            <h3>Scénáře</h3>
+            <p class="muted">FAQ, doprava/platby, produkty, kvalifikace poptávky, předání na kontakt.</p>
+          </div>
+          <div class="card">
+            <h3>Hranice tématu</h3>
+            <p class="muted">Drží se web/e-shop témat. Mimo téma odpoví slušně a vrátí konverzaci zpět.</p>
+          </div>
+          <div class="card">
+            <h3>Integrace</h3>
+            <p class="muted">Webhooky / n8n, formuláře, e-mail, CRM. Ukázka je připravená na napojení.</p>
+          </div>
+        </div>
       </div>
 
-      <div class="heroGrid">
-        <div class="card">
-          <h3>Scénáře</h3>
-          <p class="muted">FAQ, dopravné/platby, produkty, kvalifikace poptávky, předání na kontakt.</p>
-        </div>
-        <div class="card">
-          <h3>Hranice tématu</h3>
-          <p class="muted">Drží se web/e-shop témat. Mimo téma odpoví slušně a vrátí konverzaci zpět.</p>
-        </div>
-        <div class="card">
-          <h3>Integrace</h3>
-          <p class="muted">Webhooky / n8n, formuláře, e-mail, CRM. Ukázka je připravená na napojení.</p>
-        </div>
+      <div class="heroVisual">
+        <img class="heroImg" src="./assets/img/hero-tech.svg" alt="Ukázka" />
       </div>
-    </div>
+    </section>
+  </main>
 
-    <div class="heroVisual">
-      <img class="heroImg" src="./assets/img/hero-tech.svg" alt="Ukázka" />
-    </div>
-  </section>
-</main>
-
-<div id="siteFooter"></div>
+  <div id="siteFooter"></div>
 </body>
 </html>
