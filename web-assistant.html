@@ -1,73 +1,108 @@
-<!-- web-assistant.html -->
 <!doctype html>
 <html lang="cs">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Orion – Web Assistant (demo)</title>
-  <meta name="description" content="Scroll ukázka: co webový asistent umí a jak drží hranice tématu." />
+  <title>Web Assistant – Orion</title>
+
   <link rel="stylesheet" href="./assets/css/styles.css" />
-  <script src="./assets/js/config.js" defer></script>
-  <script src="./assets/js/utils.js" defer></script>
-  <script src="./assets/js/chat.js" defer></script>
+
+  <script src="./assets/js/config.js"></script>
   <script src="./assets/js/app.js" defer></script>
+  <script src="./assets/js/chat.js" defer></script>
 </head>
 <body>
+  <div id="siteHeader"></div>
 
-<div id="siteHeader"></div>
-
-<main class="container page">
-  <section class="page-hero">
+  <main class="container page">
     <div class="pill">Web assistant • prezentační ukázka</div>
-    <h1>Orion — AI Web Assistant</h1>
+    <h1>Orion — Web Assistant</h1>
+
     <p class="muted">
-      Tato stránka je scroll ukázka: co asistent umí, kdo ho využije a jak drží hranice tématu. Chat se otevře až po kliknutí na ikonu vpravo dole.
+      Tohle je stránka, kterou můžeš posílat klientům. Je postavená tak, aby byla srozumitelná na první pohled:
+      co Orion umí, jak drží hranice, jak probíhá předání poptávky a jak se napojuje na systémy (n8n/webhook).
     </p>
-  </section>
 
-  <section class="grid2">
-    <div class="card">
-      <h2>Typické scénáře</h2>
+    <section class="grid2" style="margin-top:16px">
+      <div class="card">
+        <h2>Co Orion umí</h2>
+        <ul class="muted" style="margin-top:8px">
+          <li>odpoví na opakující se dotazy (FAQ) krátce a jasně</li>
+          <li>vede uživatele k dalšímu kroku (kontakt / konzultace)</li>
+          <li>umí „držet téma“ (web/e-shop) – mimo téma vrací zpět</li>
+          <li>sbírá kontext (co přesně chce návštěvník, co je problém)</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Co Orion záměrně nedělá</h2>
+        <ul class="muted" style="margin-top:8px">
+          <li>nepouští se do témat mimo web/e-shop scénáře</li>
+          <li>neslibuje věci bez dat (radši položí doplňující otázku)</li>
+          <li>nepředstírá „lidského operátora“ – je to asistent</li>
+        </ul>
+      </div>
+    </section>
+
+    <section style="margin-top:22px">
+      <h2>Hranice tématu a důvěryhodnost</h2>
       <p class="muted">
-        FAQ a navigace k dalšímu kroku (poptávka/konzultace), vysvětlení služby, základní kvalifikace zájmu a doporučení další akce – bez zbytečného balastu.
+        Demo je schválně omezené. Klient díky tomu vidí, že asistent nezabloudí do nesmyslů.
+        Pokud přijde dotaz mimo téma, Orion:
+        <b>odpoví slušně</b> a hned <b>naváže relevantní otázkou</b> zpět do web/e-shop scénáře.
       </p>
-    </div>
-    <div class="card">
-      <h2>Hranice a důvěryhodnost</h2>
+
+      <div class="grid3" style="margin-top:12px">
+        <div class="card">
+          <h3>Dotaz</h3>
+          <p class="muted">Uživatel napíše dotaz nebo klikne na quick replies.</p>
+        </div>
+        <div class="card">
+          <h3>Odpověď</h3>
+          <p class="muted">Stručná odpověď + návrh dalšího kroku (např. kontakt).</p>
+        </div>
+        <div class="card">
+          <h3>Předání</h3>
+          <p class="muted">Poptávka → formulář → n8n → e-mail/CRM/handoff.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h2>Vyzkoušet live demo</h2>
       <p class="muted">
-        Orion je v ukázce záměrně omezen na web/e-shop témata. Když přijde dotaz mimo téma, odpoví slušně a hned vrátí konverzaci zpět k relevantnímu.
+        Klikni na ikonu chatu vpravo dole. V ukázce jsou připravené rychlé volby a můžeš napsat vlastní dotaz.
       </p>
-    </div>
-  </section>
-
-  <section class="section">
-    <h2 class="center">Kdo to využije</h2>
-    <p class="muted center">Firemní weby i e-shopy – hlavně tam, kde se opakuje stejný typ dotazů a má smysl automatizace.</p>
-
-    <div class="grid3">
-      <div class="card">
-        <h3>Firemní web</h3>
-        <p class="muted">Vysvětlení služby, kvalifikace zájmu, nasměrování na kontakt / konzultaci.</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
+        <a class="btn btn-primary" href="./kontakt.html">Chci konzultaci</a>
+        <a class="btn" href="./jak-to-funguje.html">Jak to funguje</a>
       </div>
-      <div class="card">
-        <h3>E-shop</h3>
-        <p class="muted">Dotazy k nabídce, doporučení, základní podpora – ukázka chování a stylu odpovědí.</p>
+    </section>
+
+    <section style="margin-top:18px">
+      <h2>Pro koho je nasazení typicky nejvýhodnější</h2>
+      <p class="muted">
+        Hlavně pro weby a e-shopy, které mají návštěvnost a opakující se dotazy. Tam je návratnost nejrychlejší.
+      </p>
+
+      <div class="grid3" style="margin-top:12px">
+        <div class="card">
+          <h3>E-shop podpora</h3>
+          <p class="muted">Doprava/platby, reklamace, dostupnost, základní doporučení a orientace v nabídce.</p>
+        </div>
+        <div class="card">
+          <h3>Lead kvalifikace</h3>
+          <p class="muted">Sbírá vstupní info (co chce, kdy, rozpočet, typ služby) → předá operátorovi.</p>
+        </div>
+        <div class="card">
+          <h3>Směrování</h3>
+          <p class="muted">Když uživatel „tápe“, Orion ho navede na správnou stránku / kontakt.</p>
+        </div>
       </div>
-      <div class="card">
-        <h3>Lokální služby</h3>
-        <p class="muted">Rezervace/konzultace, rychlé odpovědi, filtrace poptávek – čistě a srozumitelně.</p>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="section">
-    <h2 class="center">Vyzkoušejte si to</h2>
-    <p class="muted center">Klikněte na ikonu chatu vpravo dole. V ukázce jsou připravené quick replies i vlastní dotaz.</p>
-  </section>
-</main>
+  </main>
 
-<div id="siteFooter"></div>
-
-
+  <div id="siteFooter"></div>
 </body>
 </html>
