@@ -1,84 +1,97 @@
 <!doctype html>
 <html lang="cs">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kontakt | Orion Web Assistant (DEMO)</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kontakt – Orion</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <link rel="stylesheet" href="./assets/css/contact.css" />
 
-  <link rel="stylesheet" href="assets/css/styles.css" />
-  <link rel="stylesheet" href="assets/css/contact.css" />
+  <script src="./assets/js/config.js"></script>
+  <script src="./assets/js/app.js" defer></script>
+  <script src="./assets/js/chat.js" defer></script>
+  <script src="./assets/js/contact.js" defer></script>
 </head>
 <body>
-  <header class="topbar">
-    <div class="container navwrap">
-      <a class="brand" href="index.html" aria-label="Orion Web Assistant">
-        <img src="assets/img/orion-mark.svg" alt="Orion" />
-        <span>Orion Web Assistant</span>
-        <span class="pill">DEMO</span>
-      </a>
+  <div id="siteHeader"></div>
 
-      <nav class="menu" aria-label="Hlavní menu">
-        <a href="./index.html">Domů</a>
-        <a href="./web-assistant.html">Vyzkoušet</a>
-        <a href="./jak-to-funguje.html">Jak to funguje</a>
-        <a href="./ukazky.html">Ukázky</a>
-        <a class="active cta" href="./kontakt.html">Kontakt</a>
-      </nav>
-    </div>
-  </header>
+  <main class="container page">
+    <div class="pill">Nezávazná konzultace</div>
+    <h1>Kontakt</h1>
 
-  <main class="contact-wrap">
-    <section class="contact-card" aria-label="Kontaktní formulář">
-      <div class="contact-head">
-        <span class="badge">Nezávazná poptávka</span>
-        <h1>Kontakt</h1>
-        <p>Po odeslání se zobrazí potvrzení a formulář se vyčistí.</p>
+    <p class="muted">
+      Pošlete zprávu – demo formulář odešle požadavek do n8n a my se ozveme.
+      Stačí e-mail a zpráva. Telefon je volitelný.
+    </p>
+
+    <section class="grid2" style="margin-top:14px">
+      <div class="card contactCard">
+        <h2>Kontaktujte nás</h2>
+        <p class="muted">
+          Napište stručně: typ webu (firemní / e-shop), co má asistent řešit nejčastěji, a co má být cílová akce
+          (kontakt, poptávka, objednávka).
+        </p>
+
+        <form class="contactForm" id="contactForm" novalidate>
+          <div class="row">
+            <label>
+              Jméno
+              <input name="name" type="text" placeholder="Vaše jméno" />
+            </label>
+
+            <label>
+              E-mail <span class="req">*</span>
+              <input name="email" type="email" placeholder="name@firma.cz" required />
+            </label>
+
+            <label>
+              Telefon
+              <input name="phone" type="tel" placeholder="+420…" />
+            </label>
+          </div>
+
+          <label>
+            Zpráva <span class="req">*</span>
+            <textarea name="message" rows="7" placeholder="Např. e-shop, dotazy na dopravu/platby + reklamace, cílem je snížit zátěž podpory a vést na kontakt." required></textarea>
+          </label>
+
+          <button class="btn btn-primary" type="submit" id="contactSubmit">Odeslat</button>
+          <p class="muted" id="contactStatus" style="margin-top:10px"></p>
+        </form>
       </div>
 
-      <form id="orionContactForm" class="contact-form" novalidate>
-        <div class="grid">
-          <label>
-            <span>Jméno *</span>
-            <input type="text" name="name" autocomplete="name" required />
-          </label>
-          <label>
-            <span>E-mail *</span>
-            <input type="email" name="email" autocomplete="email" required />
-          </label>
-          <label>
-            <span>Telefon</span>
-            <input type="tel" name="phone" autocomplete="tel" />
-          </label>
+      <div>
+        <div class="card">
+          <h2>Co obvykle řešíme</h2>
+          <ul class="muted" style="margin-top:8px">
+            <li>E-shop: FAQ, doprava/platby, produkty, skladovost.</li>
+            <li>Firemní web: kvalifikace leadů, směrování poptávek.</li>
+            <li>Integrace: formuláře, e-mail, CRM, automatizace v n8n.</li>
+          </ul>
+          <p class="muted" style="margin-top:10px">
+            Cenu neuvádím dopředu — domluvíme se podle rozsahu při krátké konzultaci.
+          </p>
         </div>
 
-        <label class="full">
-          <span>Zpráva *</span>
-          <textarea name="message" rows="6" required placeholder="Např. web/e-shop, co má chatbot řešit, případně na čem web běží."></textarea>
-        </label>
-
-        <div class="actions">
-          <button id="contactSubmit" class="btn-primary" type="submit">Odeslat</button>
-          <button class="btn-secondary" type="button" onclick="location.href='web-assistant.html'">Vyzkoušet demo</button>
-          <span id="contactStatus" class="status" aria-live="polite"></span>
+        <div class="card" style="margin-top:12px">
+          <h2>Rychlý postup</h2>
+          <ol class="muted" style="margin-top:8px">
+            <li>pošleš zprávu přes formulář</li>
+            <li>já si vezmu kontext (typ webu + dotazy + cíl)</li>
+            <li>domluvíme krátkou konzultaci</li>
+            <li>nasazení + doladění pravidel/KB</li>
+          </ol>
         </div>
-      </form>
+
+        <div class="card" style="margin-top:12px">
+          <img src="./assets/img/hero-tech.svg" alt="Orion – grafika" style="width:100%; height:auto; display:block;" />
+        </div>
+      </div>
     </section>
+
   </main>
 
-  <footer class="footer">
-    <div class="container foot">
-      <span>© <span id="year"></span> Orion Web Assistant — demo ukázka</span>
-      <span class="muted">CZ + lehce EN termíny</span>
-    </div>
-  </footer>
-
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/utils.js"></script>
-  <script src="assets/js/contact.js"></script>
-  <script src="assets/js/app.js"></script>
+  <div id="siteFooter"></div>
 </body>
 </html>
