@@ -1,153 +1,121 @@
+<!-- kontakt.html -->
 <!doctype html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kontakt | Orion – AI Web Assistant</title>
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-
-  <!-- Global + page CSS (správně relativně) -->
-  <link rel="stylesheet" href="assets/css/styles.css">
-  <link rel="stylesheet" href="assets/css/contact.css">
+  <title>Orion – Kontakt</title>
+  <meta name="description" content="Kontaktujte nás ohledně nasazení AI webového asistenta Orion na váš web nebo e-shop." />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <link rel="stylesheet" href="./assets/css/contact.css" />
+  <script src="./assets/js/config.js" defer></script>
+  <script src="./assets/js/utils.js" defer></script>
+  <script src="./assets/js/chat.js" defer></script>
+  <script src="./assets/js/contact.js" defer></script>
 </head>
 
 <body>
-  <!-- TOPBAR (sjednocené menu) -->
-  <header class="topbar">
-    <div class="container topbar-inner">
-      <a class="brand" href="index.html" aria-label="Orion – Domů">
-        <img class="brand-logo" src="assets/img/orion-mark.svg" alt="Orion logo" />
-        <span class="brand-name">Orion</span>
-        <span class="badge">DEMO</span>
-      </a>
+<header class="topbar">
+  <div class="container nav">
+    <a class="brand" href="./index.html" aria-label="Orion (domů)">
+      <img src="./assets/img/orion-mark.svg" alt="Orion" width="36" height="36" />
+      <span class="brandText">Orion</span>
+      <span class="badge">DEMO</span>
+    </a>
 
-      <nav class="nav" aria-label="Hlavní menu">
-        <a class="nav-link" href="index.html" data-nav="home">Domů</a>
-        <a class="nav-link" href="web-assistant.html" data-nav="assistant">Web Assistant</a>
-        <a class="nav-link" href="jak-to-funguje.html" data-nav="how">Jak to funguje</a>
-        <a class="nav-link" href="ukazky.html" data-nav="demos">Ukázky</a>
-        <a class="nav-link active" href="kontakt.html" data-nav="contact">Kontakt</a>
-      </nav>
-    </div>
-  </header>
+    <nav class="menu" aria-label="Hlavní navigace">
+      <a href="./index.html">Domů</a>
+      <a href="./web-assistant.html">Vyzkoušet</a>
+      <a href="./jak-to-funguje.html">Jak to funguje</a>
+      <a href="./ukazky.html">Ukázky</a>
+      <a href="./kontakt.html" class="active">Kontakt</a>
+    </nav>
 
-  <!-- PAGE -->
-  <main class="page">
-    <section class="container">
-      <div class="page-head">
-        <h1>Kontakt</h1>
-        <p class="muted">
-          Stačí e-mail a zpráva. Formulář odešle požadavek do n8n a přijde mi e-mail.
-        </p>
-      </div>
-
-      <div class="contact-wrap">
-        <div class="contact-card">
-          <div class="contact-card-head">
-            <h2>Kontaktujte nás</h2>
-            <p class="muted">Vyplňte krátce, co potřebujete. Ozvu se co nejdříve.</p>
-          </div>
-
-          <form id="contactForm" class="contact-form" autocomplete="on">
-            <div class="grid-2">
-              <label class="field">
-                <span class="label">Jméno</span>
-                <input id="name" name="name" type="text" placeholder="Vaše jméno" />
-              </label>
-
-              <label class="field">
-                <span class="label">E-mail <span class="req">*</span></span>
-                <input id="email" name="email" type="email" required placeholder="name@firma.cz" />
-              </label>
-            </div>
-
-            <label class="field">
-              <span class="label">Telefon</span>
-              <input id="phone" name="phone" type="tel" placeholder="+420…" />
-            </label>
-
-            <label class="field">
-              <span class="label">Zpráva <span class="req">*</span></span>
-              <textarea id="message" name="message" required rows="6" placeholder="Co má Orion na vašem webu / e-shopu řešit?"></textarea>
-            </label>
-
-            <div class="actions">
-              <button id="submitBtn" type="submit" class="btn-primary">Odeslat</button>
-              <span id="status" class="status" aria-live="polite"></span>
-            </div>
-          </form>
-
-          <div class="contact-hints">
-            <h3>Co obvykle řešíme</h3>
-            <ul>
-              <li>E-shop: FAQ, doprava/platby, produkty, skladovost.</li>
-              <li>Firemní web: kvalifikace leadů, směrování poptávek.</li>
-              <li>Integrace: formuláře, e-mail, CRM, automatizace v n8n.</li>
-            </ul>
-            <p class="muted">
-              Cenu neuvádím dopředu — domluvíme se podle rozsahu při krátké konzultaci.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="container footer-inner">
-      <div class="footer-left">
-        <div class="footer-brand">
-          <img src="assets/img/orion-mark.svg" alt="Orion" />
-          <strong>Orion</strong>
-          <span class="muted">AI Web Assistant demo</span>
-        </div>
-        <div class="footer-links">
-          <a href="jak-to-funguje.html">Jak to funguje</a>
-          <a href="kontakt.html">Kontakt</a>
-        </div>
-      </div>
-      <div class="footer-right muted">
-        © <span id="year"></span> Martin Roman
-      </div>
-    </div>
-  </footer>
-
-  <!-- CHAT WIDGET (stejné jako na ostatních stránkách) -->
-  <button class="chat-fab" data-chat-fab aria-label="Otevřít chat">
-    <span>Chat</span>
-  </button>
-
-  <div class="chat-modal" data-chat-modal aria-hidden="true">
-    <div class="chat-window" role="dialog" aria-modal="true" aria-label="Orion chat">
-      <div class="chat-top">
-        <div class="chat-title">
-          <strong>Orion • AI Web Assistant</strong>
-          <div class="muted">Prezentační ukázka (web/e-shop scénáře)</div>
-        </div>
-        <button class="chat-close" data-chat-close aria-label="Zavřít chat">✕</button>
-      </div>
-
-      <div class="chat-body" data-chat-body></div>
-
-      <div class="chat-quick" data-chat-quick></div>
-
-      <form class="chat-input" data-chat-form>
-        <input type="text" data-chat-text placeholder="Napište dotaz…" autocomplete="off" />
-        <button type="submit" class="send" aria-label="Odeslat">➤</button>
-      </form>
+    <div class="cta">
+      <a class="btn primary" href="./kontakt.html">Nezávazná konzultace</a>
     </div>
   </div>
+</header>
 
-  <!-- JS (správné cesty) -->
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/utils.js"></script>
-  <script src="assets/js/chat.js"></script>
-  <script src="assets/js/contact.js"></script>
-  <script src="assets/js/app.js"></script>
+<main class="container page">
+  <section class="page-hero">
+    <h1>Kontakt</h1>
+    <p class="muted">Stačí e-mail a zpráva. Formulář odešle požadavek do n8n.</p>
+  </section>
+
+  <section class="contact-grid">
+    <div class="card">
+      <h2>Kontaktujte nás</h2>
+      <p class="muted">Ozveme se co nejdříve.</p>
+
+      <form id="orionContactForm" class="contact-form" novalidate>
+        <div class="field">
+          <label for="name">Jméno</label>
+          <input id="name" name="name" type="text" autocomplete="name" placeholder="Vaše jméno" />
+        </div>
+
+        <div class="field">
+          <label for="email">E-mail *</label>
+          <input id="email" name="email" type="email" autocomplete="email" placeholder="name@firma.cz" required />
+        </div>
+
+        <div class="field">
+          <label for="phone">Telefon</label>
+          <input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="+420…" />
+        </div>
+
+        <div class="field">
+          <label for="message">Zpráva *</label>
+          <textarea id="message" name="message" rows="6" required
+                    placeholder="Co má Orion na vašem webu/e-shopu řešit?"></textarea>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">Odeslat</button>
+          <span id="contactStatus" class="status" aria-live="polite"></span>
+        </div>
+
+        <p id="contactSuccess" class="success" hidden>Děkujeme. Zpráva byla odeslána.</p>
+      </form>
+    </div>
+
+    <aside class="card">
+      <h2>Co obvykle řešíme</h2>
+      <ul class="list">
+        <li>E-shop: FAQ, doprava/platby, produkty, skladovost.</li>
+        <li>Firemní web: kvalifikace leadů, směrování poptávek.</li>
+        <li>Integrace: formuláře, e-mail, CRM, automatizace v n8n.</li>
+      </ul>
+      <p class="muted">Cenu řešíme individuálně podle rozsahu — nejrychlejší je krátká konzultace.</p>
+    </aside>
+  </section>
+</main>
+
+<div id="contactModal" class="modal" hidden aria-hidden="true">
+  <div class="modal-backdrop"></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
+    <div class="modal-head">
+      <h3 id="contactModalTitle">Hotovo</h3>
+      <button id="contactClose" class="icon-btn" type="button" aria-label="Zavřít">✕</button>
+    </div>
+    <p class="muted">Děkuji, zpráva byla odeslána. Ozveme se co nejdříve.</p>
+    <div class="modal-actions">
+      <button id="contactClose2" class="btn btn-primary" type="button">Zavřít</button>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footerInner">
+      <div>© <span id="y"></span> Martin Roman • Orion</div>
+      <div>Prezentační ukázka • Web/e-shop assistant</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById("y").textContent = new Date().getFullYear();
+</script>
 </body>
 </html>
