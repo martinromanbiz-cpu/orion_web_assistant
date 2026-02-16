@@ -114,4 +114,29 @@
   function escapeAttr(s) {
     return escapeHTML(s).replaceAll("`", "&#096;");
   }
+// Force-load chat widget on every page (failsafe)
+(function () {
+  if (window.__ORION_CHAT_FORCE_LOADED__) return;
+  window.__ORION_CHAT_FORCE_LOADED__ = true;
+
+  function load(src) {
+    return new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.defer = true;
+      s.onload = res;
+      s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+
+  // když chat není namountěný, dotáhni ho natvrdo
+  setTimeout(async () => {
+    if (window.__ORION_CHAT_MOUNTED__) return;
+    try {
+      // config může být už načtený, ale nevadí
+      if (!window.ORION_CONFIG) await load('./assets/js/config.js');
+      await load('./assets/js/chat.js');
+    } catch (e) {}
+  }, 0);
 })();
