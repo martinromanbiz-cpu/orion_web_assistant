@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Orion – AI Web Assistant (demo)</title>
   <meta name="description" content="Prezentační ukázka AI webového asistenta pro weby a e-shopy." />
+
   <link rel="stylesheet" href="./assets/css/styles.css" />
 
   <script src="./assets/js/config.js"></script>
@@ -15,12 +16,17 @@
   <div id="siteHeader"></div>
 
   <main class="container page">
+
+    <!-- HERO -->
     <section class="hero">
       <div class="heroText">
         <div class="pill">Prezentační ukázka • web/e-shop scénáře</div>
+
         <h1>Orion — AI Web Assistant</h1>
+
         <p class="muted">
-          Ukázka asistenta pro weby a e-shopy: krátké odpovědi, jasné hranice tématu a vedení k dalšímu kroku (kontakt/konzultace).
+          Tohle je demo ukázka asistenta pro firemní weby a e-shopy. Záměrně odpovídá krátce, drží hranice tématu
+          (web/e-shop) a umí uživatele navést na další krok – typicky na kontakt / konzultaci.
         </p>
 
         <div class="heroActions">
@@ -30,24 +36,92 @@
 
         <div class="heroGrid">
           <div class="card">
-            <h3>Scénáře</h3>
-            <p class="muted">FAQ, doprava/platby, produkty, kvalifikace poptávky, předání na kontakt.</p>
+            <h3>FAQ & podpora</h3>
+            <p class="muted">
+              Opakující se dotazy: doprava, platby, reklamace, dostupnost, základní orientace v nabídce.
+            </p>
           </div>
+
+          <div class="card">
+            <h3>Kvalifikace poptávky</h3>
+            <p class="muted">
+              Když je dotaz „obchodní“ (chci nasadit, chci konzultaci), asistent se zeptá na pár věcí a předá to dál.
+            </p>
+          </div>
+
           <div class="card">
             <h3>Hranice tématu</h3>
-            <p class="muted">Drží se web/e-shop témat. Mimo téma odpoví slušně a vrátí konverzaci zpět.</p>
+            <p class="muted">
+              Mimo web/e-shop témata odpoví slušně, ale vrací konverzaci zpět. Žádné „kecání mimo“.
+            </p>
           </div>
-          <div class="card">
-            <h3>Integrace</h3>
-            <p class="muted">Webhooky / n8n, formuláře, e-mail, CRM. Ukázka je připravená na napojení.</p>
-          </div>
+        </div>
+
+        <div class="card" style="margin-top:14px">
+          <h3>Co přesně na tomhle webu uvidíš</h3>
+          <ul class="muted" style="margin-top:8px">
+            <li><b>Jednotný design</b> a navigace na všech stránkách.</li>
+            <li><b>Chat ikonka</b> vpravo dole – otevře demo chat s quick replies.</li>
+            <li><b>Kontakt formulář</b> napojený na n8n webhook (odeslání poptávky).</li>
+            <li><b>Ukázky</b> – odkazy na další demo projekty.</li>
+          </ul>
         </div>
       </div>
 
       <div class="heroVisual">
-        <img class="heroImg" src="./assets/img/hero-tech.svg" alt="Ukázka" />
+        <img class="heroImg" src="./assets/img/hero-tech.svg" alt="Ukázka Orion – web assistant" />
+        <div class="card" style="margin-top:12px">
+          <h3>Tip</h3>
+          <p class="muted">
+            Klikni na ikonu chatu vpravo dole a zkus „Kolik to stojí?“ nebo „Dá se to nasadit na můj web?“.
+          </p>
+        </div>
       </div>
     </section>
+
+    <!-- SEKCE: PRO KOHO -->
+    <section style="margin-top:26px">
+      <h2>Pro koho to je</h2>
+      <p class="muted">
+        Orion je ideální tam, kde se opakují dotazy a přitom nechceš trávit čas odpovídáním pořád dokola.
+        Ušetří čas a zlepší přehled – uživatel dostane odpověď hned a ty řešíš jen relevantní poptávky.
+      </p>
+
+      <div class="grid3" style="margin-top:14px">
+        <div class="card">
+          <h3>Firemní web</h3>
+          <p class="muted">
+            Vysvětlení služby, kvalifikace zájmu, směrování na konzultaci. Minimalizace „ztracených“ návštěvníků.
+          </p>
+        </div>
+        <div class="card">
+          <h3>E-shop</h3>
+          <p class="muted">
+            FAQ, pomoc s výběrem, podmínky dopravy/plateb, reklamace. Rychlá podpora bez čekání.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Lokální služby</h3>
+          <p class="muted">
+            Rezervace/termíny, orientační informace, filtrace poptávky. Jasné odpovědi a předání na kontakt.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="card" style="margin-top:18px">
+      <h2>Chceš to nasadit klientovi?</h2>
+      <p class="muted">
+        Nejrychlejší je krátká konzultace: typ webu, nejčastější dotazy, cílový výstup (kontakt, poptávka, objednávka).
+        Cenu neuvádím dopředu — domluvíme se podle rozsahu.
+      </p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
+        <a class="btn btn-primary" href="./kontakt.html">Nezávazná konzultace</a>
+        <a class="btn" href="./web-assistant.html">Otevřít demo stránku</a>
+      </div>
+    </section>
+
   </main>
 
   <div id="siteFooter"></div>
