@@ -21,20 +21,24 @@
   let history = safeJson(localStorage.getItem(historyKey), []);
   if(!Array.isArray(history)) history = [];
 
-  function open(){
-    panel.classList.add("open");
-    input.focus();
-    if(body.children.length === 0){
-      // Úvodní zpráva + quick replies (fixní)
-      bot(`Dobrý den, jsem Orion — webový asistent v prezentační ukázce. Napište dotaz, nebo klikněte na jednu z možností níže.`);
-      renderQuick([
+  const DEFAULT_QUICK = (cfg.QUICK_REPLIES && Array.isArray(cfg.QUICK_REPLIES) && cfg.QUICK_REPLIES.length)
+    ? cfg.QUICK_REPLIES
+    : [
         "Kolik to stojí?",
         "Co umí webový asistent?",
         "Jak to funguje?",
         "Dá se to nasadit na můj web?",
         "Co když se někdo ptá mimo téma?",
         "Chci nezávaznou konzultaci"
-      ]);
+      ];
+
+  function open(){
+    panel.classList.add("open");
+    input.focus();
+    if(body.children.length === 0){
+      // Úvodní zpráva + quick replies (fixní)
+      bot(`Dobrý den, jsem Orion — webový asistent v prezentační ukázce. Napište dotaz, nebo klikněte na jednu z možností níže.`);
+      renderQuick(DEFAULT_QUICK);
     }
   }
   function close(){ panel.classList.remove("open"); }
@@ -50,7 +54,8 @@
     if(!text) return;
     input.value = "";
     user(text);
-    renderQuick([]); // po odeslání schovej quick replies
+    // Quick replies zůstávají viditelné (ať nemizí po prvním kliknutí)
+    renderQuick(DEFAULT_QUICK);
     ask(text);
   }
 
