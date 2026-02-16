@@ -1,65 +1,84 @@
-<!-- ukazky.html -->
 <!doctype html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Orion – Ukázky</title>
-  <meta name="description" content="Ukázky demo stránek a scénářů pro Orion AI Web Assistant." />
-  <link rel="stylesheet" href="./assets/css/styles.css" />
-  <script src="./assets/js/config.js" defer></script>
-  <script src="./assets/js/utils.js" defer></script>
-  <script src="./assets/js/app.js" defer></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ukázky | Orion Web Assistant (DEMO)</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
+  <header class="topbar">
+    <div class="container navwrap">
+      <a class="brand" href="index.html" aria-label="Orion Web Assistant">
+        <img src="assets/img/orion-mark.svg" alt="Orion" />
+        <span>Orion Web Assistant</span>
+        <span class="pill">DEMO</span>
+      </a>
 
-<div id="siteHeader"></div>
-
-<main class="container page">
-  <section class="page-hero">
-    <div class="pill">Odkazy + krátký popis</div>
-    <h1>Ukázky</h1>
-    <p class="muted">
-      Rychlé demo stránky, kde je vidět stejný princip – jasné hranice témat, krátké odpovědi a vedení uživatele k dalšímu kroku.
-    </p>
-  </section>
-
-  <section class="cards">
-    <div class="card">
-      <h2>Chat E-shop (ukázka)</h2>
-      <p class="muted">Otevře se v novém panelu. Slouží jako doplňková ukázka.</p>
-      <a class="btn btn-primary" id="demo1" target="_blank" rel="noopener">Otevřít ukázku</a>
+      <nav class="menu" aria-label="Hlavní menu">
+        <a href="./index.html">Domů</a>
+        <a href="./web-assistant.html">Vyzkoušet</a>
+        <a href="./jak-to-funguje.html">Jak to funguje</a>
+        <a class="active" href="./ukazky.html">Ukázky</a>
+        <a href="./kontakt.html" class="cta">Kontakt</a>
+      </nav>
     </div>
+  </header>
 
-    <div class="card">
-      <h2>Chatbot Test (ukázka)</h2>
-      <p class="muted">Otevře se v novém panelu. Slouží jako doplňková ukázka.</p>
-      <a class="btn btn-primary" id="demo2" target="_blank" rel="noopener">Otevřít ukázku</a>
+  <main>
+    <section class="hero small">
+      <div class="container">
+        <h1>Ukázky</h1>
+        <p class="lead">Odkazy na další demo ukázky (bere se z config.js).</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="card">
+          <h2>Dostupné ukázky</h2>
+          <p class="muted">Seznam se naplní automaticky z <code>window.ORION_CONFIG.DEMO_LINKS</code>.</p>
+
+          <div id="demoLinks" style="margin-top:12px;"></div>
+
+          <div style="margin-top:14px;">
+            <a class="btn" href="web-assistant.html">Otevřít hlavní demo</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container foot">
+      <span>© <span id="year"></span> Orion Web Assistant — demo ukázka</span>
+      <span class="muted">CZ + lehce EN termíny</span>
     </div>
+  </footer>
 
-    <div class="card">
-      <h2>Další ukázky</h2>
-      <p class="muted">Když chceš, přidáme sem další scénáře a landingy.</p>
-      <a class="btn" href="./dalsi-ukazky.html">Zobrazit další ukázky</a>
-    </div>
-  </section>
-
-  <section class="section">
-    <h2>Chcete ukázku přímo pro váš web?</h2>
-    <p class="muted">Stačí napsat, jestli jde o firemní web nebo e-shop a co má asistent řešit nejčastěji.</p>
-    <a class="btn btn-primary" href="./kontakt.html">Nezávazná konzultace</a>
-  </section>
-</main>
-
-<div id="siteFooter"></div>
-
-<script>
-  document.getElementById("y").textContent = new Date().getFullYear();
-  const links = (window.ORION_CONFIG && window.ORION_CONFIG.DEMO_LINKS) ? window.ORION_CONFIG.DEMO_LINKS : [];
-  const d1 = links.find(x => (x.title || "").toLowerCase().includes("e-shop"));
-  const d2 = links.find(x => (x.title || "").toLowerCase().includes("test"));
-  if (d1) document.getElementById("demo1").href = d1.url;
-  if (d2) document.getElementById("demo2").href = d2.url;
-</script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script>
+    (function () {
+      const root = document.getElementById("demoLinks");
+      const links = (window.ORION_CONFIG && window.ORION_CONFIG.DEMO_LINKS) ? window.ORION_CONFIG.DEMO_LINKS : [];
+      if (!links.length) {
+        root.innerHTML = "<p class='muted'>DEMO_LINKS nejsou nastavené v config.js.</p>";
+        return;
+      }
+      root.innerHTML = links.map(l => `
+        <div class="card" style="margin-top:10px;">
+          <strong>${l.title}</strong><br/>
+          <a href="${l.url}" target="_blank" rel="noopener">${l.url}</a>
+        </div>
+      `).join("");
+    })();
+  </script>
+  <script src="assets/js/app.js"></script>
 </body>
 </html>
