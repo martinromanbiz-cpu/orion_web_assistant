@@ -439,3 +439,33 @@ input:focus, textarea:focus{
   .menu{ display:none; }
   .navToggle{ display:inline-flex; }
 }
+/* --- Chat: neprůhledné, čisté, modré quick replies --- */
+.orion-chat-overlay {
+  background: rgba(10, 14, 28, 0.35) !important;
+}
+
+.orion-chat-panel {
+  background: #ffffff !important;
+  border: 1px solid rgba(30, 58, 138, 0.12) !important;
+  box-shadow: 0 24px 80px rgba(0,0,0,.18) !important;
+}
+
+.orion-quick-reply {
+  background: #1e40af !important; /* výrazná modrá */
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
+}
+
+.orion-quick-reply:hover {
+  filter: brightness(1.05);
+}
+
+.orion-chat-input {
+  background: #eef3ff !important;       /* modro-šedá světlá */
+  border: 1px solid #c9c5ff !important; /* jemná fialová */
+  color: #0b1220 !important;
+}
+
+.orion-chat-input::placeholder {
+  color: rgba(11,18,32,.55) !important;
+}
