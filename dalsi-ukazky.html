@@ -1,61 +1,80 @@
+<!-- dalsi-ukazky.html -->
 <!doctype html>
 <html lang="cs">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Ukázky – Orion</title>
-  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml"/>
-  <link rel="stylesheet" href="assets/css/styles.css"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Orion – Další ukázky</title>
+  <meta name="description" content="Další ukázky a scénáře pro Orion AI Web Assistant." />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
 </head>
 <body>
 
 <header class="topbar">
-  <div class="container">
-    <div class="nav">
-      <a class="brand" href="index.html">
-        <img class="mark" src="assets/img/orion-mark.svg" alt="Orion"/>
-        <span>Martin Roman</span>
-      </a>
-      <nav class="menu">
-        <a data-nav href="index.html">Domů</a>
-        <a data-nav href="web-assistant.html">Web Assistant</a>
-        <a data-nav href="jak-to-funguje.html">Jak to funguje</a>
-        <a data-nav href="ukazky.html">Ukázky</a>
-        <a data-nav href="kontakt.html">Kontakt</a>
-      </nav>
-      <div class="cta">
-        <a class="btn primary" href="web-assistant.html">Vyzkoušet Orion →</a>
-      </div>
+  <div class="container nav">
+    <a class="brand" href="./index.html" aria-label="Orion (domů)">
+      <img src="./assets/img/orion-mark.svg" alt="Orion" width="36" height="36" />
+      <span class="brandText">Orion</span>
+      <span class="badge">DEMO</span>
+    </a>
+
+    <nav class="menu" aria-label="Hlavní navigace">
+      <a href="./index.html">Domů</a>
+      <a href="./web-assistant.html">Vyzkoušet</a>
+      <a href="./jak-to-funguje.html">Jak to funguje</a>
+      <a href="./ukazky.html" class="active">Ukázky</a>
+      <a href="./kontakt.html">Kontakt</a>
+    </nav>
+
+    <div class="cta">
+      <a class="btn primary" href="./kontakt.html">Nezávazná konzultace</a>
     </div>
   </div>
 </header>
 
-<main class="container">
-  <div class="pageHead">
+<main class="container page">
+  <section class="page-hero">
+    <div class="pill">Rozšíření • scénáře • varianty</div>
     <h1>Další ukázky</h1>
-    <p>Odkazy na předchozí demo weby. Otevřou se v novém panelu.</p>
-  </div>
+    <p class="muted">Tady můžeš postupně přidávat další landingy, scénáře a varianty chatbota.</p>
+  </section>
 
-  <section class="section">
-    <div class="split" data-demo-list>
-      <!-- plní se z config.js -->
+  <section class="cards">
+    <div class="card">
+      <h2>Scénář: Lokální služby</h2>
+      <p class="muted">Rezervace / konzultace, otevírací doba, ceny jen orientačně a handoff na kontakt.</p>
+      <a class="btn" href="./kontakt.html">Chci to nasadit</a>
+    </div>
+
+    <div class="card">
+      <h2>Scénář: Firemní web</h2>
+      <p class="muted">Kvalifikace poptávky a směrování na správný kontakt / formulář.</p>
+      <a class="btn" href="./kontakt.html">Nezávazná konzultace</a>
+    </div>
+
+    <div class="card">
+      <h2>Scénář: E-shop podpora</h2>
+      <p class="muted">Dotazy k objednávkám, dopravě, reklamacím, doporučení produktů – s jasnými hranicemi.</p>
+      <a class="btn" href="./kontakt.html">Probrat možnosti</a>
     </div>
   </section>
 
-  <div class="spacer"></div>
+  <section class="section">
+    <a class="btn" href="./ukazky.html">← Zpět na ukázky</a>
+  </section>
 </main>
 
 <footer class="footer">
   <div class="container">
     <div class="footerInner">
-      <div>© <span id="y"></span> Martin Roman</div>
-      <div>Ukázky • GitHub Pages</div>
+      <div>© <span id="y"></span> Martin Roman • Orion</div>
+      <div>Prezentační ukázka • Web/e-shop assistant</div>
     </div>
   </div>
 </footer>
 
-<script>document.getElementById("y").textContent = new Date().getFullYear();</script>
-<script src="assets/js/config.js"></script>
-<script src="assets/js/app.js"></script>
+<script>
+  document.getElementById("y").textContent = new Date().getFullYear();
+</script>
 </body>
 </html>
