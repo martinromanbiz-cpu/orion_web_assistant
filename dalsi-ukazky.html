@@ -1,52 +1,59 @@
-<!-- dalsi-ukazky.html -->
 <!doctype html>
 <html lang="cs">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Orion – Další ukázky</title>
-  <meta name="description" content="Další ukázky a scénáře pro Orion AI Web Assistant." />
+  <title>Další ukázky – Orion</title>
+
   <link rel="stylesheet" href="./assets/css/styles.css" />
+
+  <script src="./assets/js/config.js"></script>
   <script src="./assets/js/app.js" defer></script>
+  <script src="./assets/js/chat.js" defer></script>
 </head>
 <body>
+  <div id="siteHeader"></div>
 
-<div id="siteHeader"></div>
-
-<main class="container page">
-  <section class="page-hero">
-    <div class="pill">Rozšíření • scénáře • varianty</div>
+  <main class="container page">
+    <div class="pill">Další ukázky</div>
     <h1>Další ukázky</h1>
-    <p class="muted">Tady můžeš postupně přidávat další landingy, scénáře a varianty chatbota.</p>
-  </section>
 
-  <section class="cards">
-    <div class="card">
-      <h2>Scénář: Lokální služby</h2>
-      <p class="muted">Rezervace / konzultace, otevírací doba, ceny jen orientačně a handoff na kontakt.</p>
-      <a class="btn" href="./kontakt.html">Chci to nasadit</a>
-    </div>
+    <p class="muted">
+      Tohle je stránka pro rozšíření (ať web nevypadá „tenký“). Můžeš sem přidávat další use-cases,
+      screenshoty, mini-case studies nebo popis integrací.
+    </p>
 
-    <div class="card">
-      <h2>Scénář: Firemní web</h2>
-      <p class="muted">Kvalifikace poptávky a směrování na správný kontakt / formulář.</p>
-      <a class="btn" href="./kontakt.html">Nezávazná konzultace</a>
-    </div>
+    <section class="grid2" style="margin-top:14px">
+      <div class="card">
+        <h2>Use-case: E-shop</h2>
+        <p class="muted">
+          Dotazy typu: doprava/platby, dostupnost, vrácení zboží, reklamace, doporučení produktu.
+          Cíl: rychlá odpověď a snížení zátěže podpory.
+        </p>
+      </div>
+      <div class="card">
+        <h2>Use-case: Firemní web</h2>
+        <p class="muted">
+          Dotazy typu: co nabízíte, kolik to stojí, jak probíhá spolupráce, kdy je možné začít.
+          Cíl: kvalifikace leadu a předání na konzultaci.
+        </p>
+      </div>
+    </section>
 
-    <div class="card">
-      <h2>Scénář: E-shop podpora</h2>
-      <p class="muted">Dotazy k objednávkám, dopravě, reklamacím, doporučení produktů – s jasnými hranicemi.</p>
-      <a class="btn" href="./kontakt.html">Probrat možnosti</a>
-    </div>
-  </section>
+    <section class="card" style="margin-top:16px">
+      <h2>Integrace</h2>
+      <p class="muted">
+        Demo ukazuje webhook přístup. V reálu se řeší napojení na CRM/helpdesk/e-mail/objednávky.
+        Pro klienta je důležitý výstup: méně dotazů na lidi + víc relevantních poptávek.
+      </p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
+        <a class="btn btn-primary" href="./kontakt.html">Chci konzultaci</a>
+        <a class="btn" href="./web-assistant.html">Zpět na demo</a>
+      </div>
+    </section>
 
-  <section class="section">
-    <a class="btn" href="./ukazky.html">← Zpět na ukázky</a>
-  </section>
-</main>
+  </main>
 
-<div id="siteFooter"></div>
-
-
+  <div id="siteFooter"></div>
 </body>
 </html>
