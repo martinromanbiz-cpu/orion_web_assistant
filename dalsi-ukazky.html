@@ -7,30 +7,11 @@
   <title>Orion – Další ukázky</title>
   <meta name="description" content="Další ukázky a scénáře pro Orion AI Web Assistant." />
   <link rel="stylesheet" href="./assets/css/styles.css" />
+  <script src="./assets/js/app.js" defer></script>
 </head>
 <body>
 
-<header class="topbar">
-  <div class="container nav">
-    <a class="brand" href="./index.html" aria-label="Orion (domů)">
-      <img src="./assets/img/orion-mark.svg" alt="Orion" width="36" height="36" />
-      <span class="brandText">Orion</span>
-      <span class="badge">DEMO</span>
-    </a>
-
-    <nav class="menu" aria-label="Hlavní navigace">
-      <a href="./index.html">Domů</a>
-      <a href="./web-assistant.html">Vyzkoušet</a>
-      <a href="./jak-to-funguje.html">Jak to funguje</a>
-      <a href="./ukazky.html" class="active">Ukázky</a>
-      <a href="./kontakt.html">Kontakt</a>
-    </nav>
-
-    <div class="cta">
-      <a class="btn primary" href="./kontakt.html">Nezávazná konzultace</a>
-    </div>
-  </div>
-</header>
+<div id="siteHeader"></div>
 
 <main class="container page">
   <section class="page-hero">
@@ -64,17 +45,8 @@
   </section>
 </main>
 
-<footer class="footer">
-  <div class="container">
-    <div class="footerInner">
-      <div>© <span id="y"></span> Martin Roman • Orion</div>
-      <div>Prezentační ukázka • Web/e-shop assistant</div>
-    </div>
-  </div>
-</footer>
+<div id="siteFooter"></div>
 
-<script>
-  document.getElementById("y").textContent = new Date().getFullYear();
-</script>
+
 </body>
 </html>
