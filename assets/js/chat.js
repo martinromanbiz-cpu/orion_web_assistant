@@ -1,155 +1,123 @@
-// assets/js/chat.js
-(function(){
+/* assets/js/chat.js */
+(function () {
+  "use strict";
+
+  const $ = (sel, root = document) => root.querySelector(sel);
+
+  const fab = $("#orionFab");
+  const panel = $("#orionPanel");
+  const closeBtn = $("#orionClose");
+  const form = $("#orionForm");
+  const input = $("#orionInput");
+  const sendBtn = $("#orionSend");
+  const msgs = $("#orionMsgs");
+  const quick = $("#orionQuick");
+
+  if (!fab || !panel || !closeBtn || !form || !input || !sendBtn || !msgs || !quick) {
+    // stránka nemá chat markup -> nic nedělej
+    return;
+  }
+
   const cfg = window.ORION_CONFIG || {};
-  const webhook = cfg.N8N_WEBHOOK_URL;
+  const WEBHOOK = cfg.N8N_WEBHOOK_URL;
 
-  const fab = document.querySelector("[data-chat-fab]");
-  const panel = document.querySelector("[data-chat-panel]");
-  const closeBtn = document.querySelector("[data-chat-close]");
-  const body = document.querySelector("[data-chat-body]");
-  const input = document.querySelector("[data-chat-input]");
-  const send = document.querySelector("[data-chat-send]");
-  const quickWrap = document.querySelector("[data-chat-quick]");
+  // Default quick replies (zůstávají viditelné i po odeslání)
+  const DEFAULT_QUICK = [
+    "Kolik to stojí?",
+    "Co umí webový asistent?",
+    "Jak to funguje?",
+    "Dá se to nasadit na můj web?",
+    "Co když se někdo ptá mimo téma?",
+    "Chci nezávaznou konzultaci",
+  ];
 
-  if(!fab || !panel || !body || !input || !send) return;
-
-  const sessionKey = "orion_session_id";
-  const historyKey = "orion_history";
-  const sessionId = localStorage.getItem(sessionKey) || cryptoRandomId();
-  localStorage.setItem(sessionKey, sessionId);
-
-  let history = safeJson(localStorage.getItem(historyKey), []);
-  if(!Array.isArray(history)) history = [];
-
-  const DEFAULT_QUICK = (cfg.QUICK_REPLIES && Array.isArray(cfg.QUICK_REPLIES) && cfg.QUICK_REPLIES.length)
-    ? cfg.QUICK_REPLIES
-    : [
-        "Kolik to stojí?",
-        "Co umí webový asistent?",
-        "Jak to funguje?",
-        "Dá se to nasadit na můj web?",
-        "Co když se někdo ptá mimo téma?",
-        "Chci nezávaznou konzultaci"
-      ];
-
-  function open(){
+  function openChat() {
     panel.classList.add("open");
+    fab.classList.add("hidden");
     input.focus();
-    if(body.children.length === 0){
-      // Úvodní zpráva + quick replies (fixní)
-      bot(`Dobrý den, jsem Orion — webový asistent v prezentační ukázce. Napište dotaz, nebo klikněte na jednu z možností níže.`);
-      renderQuick(DEFAULT_QUICK);
-    }
   }
-  function close(){ panel.classList.remove("open"); }
-
-  fab.addEventListener("click", ()=> panel.classList.contains("open") ? close() : open());
-  closeBtn && closeBtn.addEventListener("click", close);
-
-  send.addEventListener("click", onSend);
-  input.addEventListener("keydown", (e)=>{ if(e.key==="Enter") onSend(); });
-
-  function onSend(){
-    const text = input.value.trim();
-    if(!text) return;
-    input.value = "";
-    user(text);
-    // Quick replies zůstávají viditelné (ať nemizí po prvním kliknutí)
-    renderQuick(DEFAULT_QUICK);
-    ask(text);
+  function closeChat() {
+    panel.classList.remove("open");
+    fab.classList.remove("hidden");
   }
 
-  function user(text){
-    body.insertAdjacentHTML("beforeend", `<div class="msg user">${escapeHtml(text)}</div>`);
-    scrollDown();
+  fab.addEventListener("click", openChat);
+  closeBtn.addEventListener("click", closeChat);
+
+  function addMsg(role, text) {
+    const wrap = document.createElement("div");
+    wrap.className = role === "user" ? "msg user" : "msg bot";
+    wrap.textContent = text;
+    msgs.appendChild(wrap);
+    msgs.scrollTop = msgs.scrollHeight;
   }
-  function bot(text){
-    body.insertAdjacentHTML("beforeend", `<div class="msg bot">${escapeHtml(text)}</div>`);
-    scrollDown();
-  }
-  function renderQuick(items){
-    if(!quickWrap) return;
-    if(!items || !items.length){
-      quickWrap.innerHTML = "";
-      return;
-    }
-    quickWrap.innerHTML = `<div class="quick">${
-      items.map(t=>`<button class="pill" type="button">${escapeHtml(t)}</button>`).join("")
-    }</div>`;
-    quickWrap.querySelectorAll(".pill").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        input.value = btn.textContent;
-        onSend();
+
+  function renderQuick(list) {
+    quick.innerHTML = "";
+    list.forEach((t) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "pillBtn";
+      b.textContent = t;
+      b.addEventListener("click", () => {
+        input.value = t;
+        form.requestSubmit();
       });
+      quick.appendChild(b);
     });
   }
 
-  async function ask(text){
-    if(!webhook){
-      bot("Webhook není nastavený. Doplňte ho do assets/js/config.js a zkuste to znovu.");
-      return;
-    }
+  // Render quick replies always (not cleared)
+  renderQuick(DEFAULT_QUICK);
 
-    // history: udržuj krátké (kvůli tokenům)
-    const compactHistory = history.slice(-10);
+  // initial bot message
+  addMsg(
+    "bot",
+    "Dobrý den, jsem Orion — webový asistent v prezentační ukázce. Napište dotaz, nebo klikněte na jednu z možností níže."
+  );
 
-    const payload = {
-      chatInput: text,
-      sessionId,
-      history: compactHistory,
-      meta: {
-        source: "orion_web_assistant",
-        page: window.location.pathname
+  async function send(text) {
+    if (!text || !text.trim()) return;
+    const clean = text.trim();
+
+    addMsg("user", clean);
+
+    // UI lock
+    input.value = "";
+    input.focus();
+    sendBtn.disabled = true;
+
+    try {
+      if (!WEBHOOK) {
+        addMsg("bot", "Chybí nastavení N8N webhooku. Zkontrolujte assets/js/config.js.");
+        return;
       }
-    };
 
-    try{
-      const res = await fetch(webhook, {
-        method:"POST",
-        headers: { "Content-Type":"application/json" },
-        body: JSON.stringify(payload)
+      const res = await fetch(WEBHOOK, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: clean }),
       });
 
-      const data = await res.json().catch(()=> ({}));
-
-      // n8n chat trigger obvykle vrací { output: "..." } nebo přímo string.
+      const data = await res.json().catch(() => ({}));
       const answer =
-        (typeof data === "string" && data) ||
-        data.output ||
-        data.text ||
-        data.answer ||
-        data.message ||
-        JSON.stringify(data);
+        (data && (data.answer || data.text || data.message)) ||
+        "OK. Potřebuji ještě upřesnit: je to firemní web, nebo e-shop?";
 
-      // ulož do historie pro další dotazy
-      history.push({ role:"user", content:text });
-      history.push({ role:"assistant", content: String(answer) });
-      localStorage.setItem(historyKey, JSON.stringify(history.slice(-30)));
+      addMsg("bot", String(answer));
 
-      bot(String(answer));
-    } catch(e){
-      bot("Teď se nepovedlo ukázku doručit. Zkuste to prosím znovu, nebo napište dotaz jinak (web/e-shop scénář).");
+      // DŮLEŽITÉ: quick replies NEmažeme. Zůstávají pořád.
+      // Pokud chceš později: dynamické quick replies z odpovědi, můžeš je sem přidat.
+
+    } catch (e) {
+      addMsg("bot", "Došlo k chybě při odesílání. Zkuste to prosím znovu.");
+    } finally {
+      sendBtn.disabled = false;
     }
   }
 
-  function scrollDown(){ body.scrollTop = body.scrollHeight; }
-  function escapeHtml(s){
-    return String(s)
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;");
-  }
-  function safeJson(s, fallback){
-    try{ return JSON.parse(s); } catch { return fallback; }
-  }
-  function cryptoRandomId(){
-    // jednoduché ID i bez crypto supportu
-    if(window.crypto && crypto.getRandomValues){
-      const a = new Uint32Array(4);
-      crypto.getRandomValues(a);
-      return Array.from(a).map(n=>n.toString(16)).join("");
-    }
-    return Math.random().toString(16).slice(2) + Date.now().toString(16);
-  }
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    send(input.value);
+  });
 })();
