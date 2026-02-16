@@ -1,47 +1,75 @@
-<!-- jak-to-funguje.html -->
 <!doctype html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Orion – Jak to funguje</title>
-  <meta name="description" content="Jak funguje Orion: integrace, KB, routing, hranice tématu." />
-  <link rel="stylesheet" href="./assets/css/styles.css" />
-  <script src="./assets/js/app.js" defer></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jak to funguje | Orion Web Assistant (DEMO)</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
+  <header class="topbar">
+    <div class="container navwrap">
+      <a class="brand" href="index.html" aria-label="Orion Web Assistant">
+        <img src="assets/img/orion-mark.svg" alt="Orion" />
+        <span>Orion Web Assistant</span>
+        <span class="pill">DEMO</span>
+      </a>
 
-<div id="siteHeader"></div>
-
-<main class="container page">
-  <section class="page-hero">
-    <div class="pill">Přehled • integrace • workflow</div>
-    <h1>Jak to funguje</h1>
-    <p class="muted">Stručně: widget na webu → webhook do n8n → router + knowledge base → odpověď + případné předání na kontakt.</p>
-  </section>
-
-  <section class="grid2">
-    <div class="card">
-      <h2>1) Vstup z webu</h2>
-      <p class="muted">Uživatel napíše dotaz do chatu nebo klikne na quick reply. Zpráva jde přes webhook do n8n.</p>
+      <nav class="menu" aria-label="Hlavní menu">
+        <a href="./index.html">Domů</a>
+        <a href="./web-assistant.html">Vyzkoušet</a>
+        <a class="active" href="./jak-to-funguje.html">Jak to funguje</a>
+        <a href="./ukazky.html">Ukázky</a>
+        <a href="./kontakt.html" class="cta">Kontakt</a>
+      </nav>
     </div>
-    <div class="card">
-      <h2>2) Routing a hranice</h2>
-      <p class="muted">Router určí intent + confidence. Mimo web/e-shop témata se asistent vrací zpět k relevantnímu.</p>
-    </div>
-    <div class="card">
-      <h2>3) Knowledge base</h2>
-      <p class="muted">Odpovědi se berou z KB (FAQ, proces, integrace, bezpečné hranice). Když chybí data, asistent se doptá.</p>
-    </div>
-    <div class="card">
-      <h2>4) Kontakt / handoff</h2>
-      <p class="muted">Když je potřeba člověk, asistent nabídne konzultaci a navede na formulář (n8n workflow).</p>
-    </div>
-  </section>
-</main>
+  </header>
 
-<div id="siteFooter"></div>
+  <main>
+    <section class="hero small">
+      <div class="container">
+        <h1>Jak to funguje</h1>
+        <p class="lead">
+          Tahle stránka vysvětluje princip nasazení chatbota na web/e-shop a jak vypadá workflow (routing → KB → odpověď).
+        </p>
+      </div>
+    </section>
 
+    <!-- PŮVODNÍ OBSAH stránky nechávám – pokud ho máš ve staré verzi, vlož sem svou sekci/části.
+         Jestli chceš, pošli sem aktuální obsah jak-to-funguje a já ho tam vložím zpět 1:1. -->
+    <section class="section">
+      <div class="container">
+        <div class="card">
+          <h2>1) Router (intent)</h2>
+          <p class="muted">Model vybere intent + confidence, aby odpověď byla konzistentní a krátká.</p>
+        </div>
 
+        <div class="card" style="margin-top:12px;">
+          <h2>2) Knowledge Base (Data Table)</h2>
+          <p class="muted">Podle intent se vytáhne správná odpověď (answer_main / followup / quick replies).</p>
+        </div>
+
+        <div class="card" style="margin-top:12px;">
+          <h2>3) Odpověď + follow-up</h2>
+          <p class="muted">AI odpoví 2–4 větami, a jen když chybí detail, položí follow-up otázku.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container foot">
+      <span>© <span id="year"></span> Orion Web Assistant — demo ukázka</span>
+      <span class="muted">CZ + lehce EN termíny</span>
+    </div>
+  </footer>
+
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/app.js"></script>
 </body>
 </html>
