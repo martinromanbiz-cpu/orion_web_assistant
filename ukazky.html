@@ -4,10 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Ukázky – Orion</title>
-
+  <meta name="description" content="Externí demo ukázky Orion AI Web Assistant." />
   <link rel="stylesheet" href="./assets/css/styles.css" />
-
-  <script src="./assets/js/config.js"></script>
+  <script src="./assets/js/config.js" defer></script>
   <script src="./assets/js/app.js" defer></script>
   <script src="./assets/js/chat.js" defer></script>
 </head>
@@ -17,54 +16,63 @@
   <main class="container page">
     <div class="pill">Odkazy + krátký popis</div>
     <h1>Ukázky</h1>
-
     <p class="muted">
-      Tady jsou doplňkové ukázky. Smysl je ukázat stejné principy: jasné hranice, krátké odpovědi, vedení uživatele
-      k dalšímu kroku. Odkazy se berou z <code>assets/js/config.js</code> (DEMO_LINKS).
+      Kliknutím se otevře nová karta. Každá ukázka demonstruje jiný styl použití (e-shop / test).
     </p>
 
-    <section class="card" style="margin-top:14px">
-      <h2>Externí demo odkazy</h2>
-      <p class="muted">
-        Kliknutím se otevře nová karta. Každá ukázka demonstruje jiný styl použití (e-shop / test).
+    <section class="card" style="margin-top:16px">
+      <h2 style="margin-bottom:10px">Externí demo odkazy</h2>
+      <div id="demoLinks" class="demoLinks"></div>
+      <p class="muted" style="margin-top:10px">
+        Odkazy se berou z <code>assets/js/config.js</code> (proměnná <code>DEMO_LINKS</code>).
       </p>
-
-      <div data-demo-list class="grid2" style="margin-top:12px">
-        <!-- generuje app.js -->
-      </div>
-    </section>
-
-    <section class="grid2" style="margin-top:16px">
-      <div class="card">
-        <h2>Co si z toho má klient odnést</h2>
-        <ul class="muted" style="margin-top:8px">
-          <li>asistent odpovídá konzistentně</li>
-          <li>neutíká mimo téma</li>
-          <li>vede návštěvníka k akci</li>
-          <li>poptávku umí předat</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h2>Co se dá upravit na míru</h2>
-        <ul class="muted" style="margin-top:8px">
-          <li>texty/brand tone</li>
-          <li>quick replies</li>
-          <li>hranice témat</li>
-          <li>napojení na interní systémy</li>
-        </ul>
-      </div>
     </section>
 
     <section class="card" style="margin-top:16px">
-      <h2>Chcete ukázku pro váš web?</h2>
-      <p class="muted">
-        Napiš typ webu (firemní / e-shop), co mají být nejčastější dotazy a jaký má být cíl (kontakt, poptávka, objednávka).
-      </p>
-      <a class="btn btn-primary" href="./kontakt.html" style="margin-top:10px">Nezávazná konzultace</a>
+      <h2>Co si z toho má klient odnést</h2>
+      <ul class="list">
+        <li>asistent odpovídá konzistentně a krátce</li>
+        <li>neutíká mimo téma</li>
+        <li>vede návštěvníka k akci (kontakt / konzultace)</li>
+        <li>poptávku umí předat (handoff)</li>
+      </ul>
+    </section>
+
+    <section class="card" style="margin-top:16px">
+      <h2>Co se dá upravit na míru</h2>
+      <ul class="list">
+        <li>texty, tone of voice, brand</li>
+        <li>quick replies (klikací dotazy)</li>
+        <li>hranice témat</li>
+        <li>napojení na interní systémy (CRM, e-mail, helpdesk)</li>
+      </ul>
+      <div style="margin-top:14px">
+        <a class="btn primary" href="./kontakt.html">Nezávazná konzultace</a>
+      </div>
     </section>
   </main>
 
   <div id="siteFooter"></div>
+
+  <script>
+    // Render DEMO_LINKS
+    (function () {
+      const mount = document.getElementById('demoLinks');
+      const links = (window.ORION_CONFIG && window.ORION_CONFIG.DEMO_LINKS) ? window.ORION_CONFIG.DEMO_LINKS : [];
+      if (!mount) return;
+
+      if (!links.length) {
+        mount.innerHTML = '<p class="muted">Žádné odkazy nejsou nastavené v config.js (DEMO_LINKS).</p>';
+        return;
+      }
+
+      mount.innerHTML = links.map(l => `
+        <div class="demoLinkCard">
+          <div class="demoLinkTitle">${(l.title || 'Ukázka')}</div>
+          <a class="btn" href="${l.url}" target="_blank" rel="noopener">Otevřít ukázku</a>
+        </div>
+      `).join('');
+    })();
+  </script>
 </body>
 </html>
