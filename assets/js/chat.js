@@ -1,123 +1,199 @@
-/* assets/js/chat.js */
+/* assets/js/chat.js
+   Robustní widget: vždy vloží ikonku + panel do stránky. Bez závislosti na HTML.
+*/
 (function () {
-  "use strict";
+  const CFG = (window.ORION_CONFIG || {});
+  const WEBHOOK = CFG.N8N_WEBHOOK_URL || "";
 
-  const $ = (sel, root = document) => root.querySelector(sel);
+  // zabrání dvojité inicializaci
+  if (window.__ORION_CHAT_MOUNTED__) return;
+  window.__ORION_CHAT_MOUNTED__ = true;
 
-  const fab = $("#orionFab");
-  const panel = $("#orionPanel");
-  const closeBtn = $("#orionClose");
-  const form = $("#orionForm");
-  const input = $("#orionInput");
-  const sendBtn = $("#orionSend");
-  const msgs = $("#orionMsgs");
-  const quick = $("#orionQuick");
-
-  if (!fab || !panel || !closeBtn || !form || !input || !sendBtn || !msgs || !quick) {
-    // stránka nemá chat markup -> nic nedělej
-    return;
-  }
-
-  const cfg = window.ORION_CONFIG || {};
-  const WEBHOOK = cfg.N8N_WEBHOOK_URL;
-
-  // Default quick replies (zůstávají viditelné i po odeslání)
-  const DEFAULT_QUICK = [
-    "Kolik to stojí?",
-    "Co umí webový asistent?",
-    "Jak to funguje?",
-    "Dá se to nasadit na můj web?",
-    "Co když se někdo ptá mimo téma?",
-    "Chci nezávaznou konzultaci",
-  ];
-
-  function openChat() {
-    panel.classList.add("open");
-    fab.classList.add("hidden");
-    input.focus();
-  }
-  function closeChat() {
-    panel.classList.remove("open");
-    fab.classList.remove("hidden");
-  }
-
-  fab.addEventListener("click", openChat);
-  closeBtn.addEventListener("click", closeChat);
-
-  function addMsg(role, text) {
-    const wrap = document.createElement("div");
-    wrap.className = role === "user" ? "msg user" : "msg bot";
-    wrap.textContent = text;
-    msgs.appendChild(wrap);
-    msgs.scrollTop = msgs.scrollHeight;
-  }
-
-  function renderQuick(list) {
-    quick.innerHTML = "";
-    list.forEach((t) => {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = "pillBtn";
-      b.textContent = t;
-      b.addEventListener("click", () => {
-        input.value = t;
-        form.requestSubmit();
-      });
-      quick.appendChild(b);
+  function el(tag, attrs = {}, html = "") {
+    const n = document.createElement(tag);
+    Object.entries(attrs).forEach(([k, v]) => {
+      if (k === "class") n.className = v;
+      else if (k === "style") n.setAttribute("style", v);
+      else if (k.startsWith("on") && typeof v === "function") n.addEventListener(k.slice(2), v);
+      else n.setAttribute(k, v);
     });
+    if (html) n.innerHTML = html;
+    return n;
   }
 
-  // Render quick replies always (not cleared)
-  renderQuick(DEFAULT_QUICK);
+  function ensureStyles() {
+    if (document.getElementById("orionChatBaseStyles")) return;
 
-  // initial bot message
-  addMsg(
-    "bot",
-    "Dobrý den, jsem Orion — webový asistent v prezentační ukázce. Napište dotaz, nebo klikněte na jednu z možností níže."
-  );
-
-  async function send(text) {
-    if (!text || !text.trim()) return;
-    const clean = text.trim();
-
-    addMsg("user", clean);
-
-    // UI lock
-    input.value = "";
-    input.focus();
-    sendBtn.disabled = true;
-
-    try {
-      if (!WEBHOOK) {
-        addMsg("bot", "Chybí nastavení N8N webhooku. Zkontrolujte assets/js/config.js.");
-        return;
+    const css = `
+      .orionChatLauncher{
+        position:fixed; right:18px; bottom:18px; z-index:99999;
+        width:54px; height:54px; border-radius:16px;
+        background:#ffffff; border:1px solid rgba(30,58,138,.18);
+        box-shadow:0 16px 40px rgba(0,0,0,.14);
+        display:flex; align-items:center; justify-content:center;
+        cursor:pointer; user-select:none;
       }
+      .orionChatLauncher:hover{ transform: translateY(-1px); }
+      .orionChatLauncher svg{ width:26px; height:26px; }
 
-      const res = await fetch(WEBHOOK, {
+      .orionChatOverlay{
+        position:fixed; inset:0; z-index:99998;
+        background: rgba(10,14,28,.35);
+        display:none;
+      }
+      .orionChatPanel{
+        position:fixed; right:18px; bottom:86px; z-index:99999;
+        width:360px; max-width: calc(100vw - 36px);
+        height:520px; max-height: calc(100vh - 120px);
+        background:#fff; border:1px solid rgba(30,58,138,.14);
+        border-radius:22px; box-shadow:0 24px 80px rgba(0,0,0,.18);
+        display:none; overflow:hidden;
+      }
+      .orionChatHeader{
+        padding:14px 14px 10px 14px;
+        border-bottom:1px solid rgba(15,23,42,.08);
+        display:flex; align-items:flex-start; justify-content:space-between;
+        gap:10px;
+      }
+      .orionChatTitle{ font-weight:800; font-size:16px; line-height:1.2; }
+      .orionChatSub{ margin-top:2px; color:rgba(15,23,42,.65); font-size:13px; }
+      .orionChatClose{
+        width:34px; height:34px; border-radius:12px;
+        background:#fff; border:1px solid rgba(15,23,42,.12);
+        cursor:pointer;
+      }
+      .orionChatBody{ padding:12px 14px; height: calc(100% - 64px); display:flex; flex-direction:column; gap:10px; }
+      .orionChatBubble{
+        background:#f6f8ff; border:1px solid rgba(30,58,138,.10);
+        border-radius:16px; padding:10px 12px; color:#0b1220;
+      }
+      .orionChatQuickRow{ display:flex; flex-wrap:wrap; gap:10px; }
+      .orionChatQR{
+        background:#1e40af; color:#fff; border:none; cursor:pointer;
+        padding:10px 12px; border-radius:999px; font-weight:700;
+      }
+      .orionChatInputRow{ margin-top:auto; display:flex; gap:10px; }
+      .orionChatInput{
+        flex:1; padding:12px 12px; border-radius:16px;
+        border:1px solid #c9c5ff; background:#eef3ff; outline:none;
+      }
+      .orionChatSend{
+        width:46px; border-radius:16px; border:1px solid rgba(15,23,42,.12);
+        background:#fff; cursor:pointer;
+      }
+    `;
+    const style = el("style", { id: "orionChatBaseStyles" }, css);
+    document.head.appendChild(style);
+  }
+
+  async function sendToN8n(text) {
+    if (!WEBHOOK) return null;
+    try {
+      const r = await fetch(WEBHOOK, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: clean }),
+        body: JSON.stringify({ message: text })
       });
-
-      const data = await res.json().catch(() => ({}));
-      const answer =
-        (data && (data.answer || data.text || data.message)) ||
-        "OK. Potřebuji ještě upřesnit: je to firemní web, nebo e-shop?";
-
-      addMsg("bot", String(answer));
-
-      // DŮLEŽITÉ: quick replies NEmažeme. Zůstávají pořád.
-      // Pokud chceš později: dynamické quick replies z odpovědi, můžeš je sem přidat.
-
+      if (!r.ok) return null;
+      const data = await r.json().catch(() => null);
+      return data;
     } catch (e) {
-      addMsg("bot", "Došlo k chybě při odesílání. Zkuste to prosím znovu.");
-    } finally {
-      sendBtn.disabled = false;
+      return null;
     }
   }
 
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    send(input.value);
-  });
+  function mount() {
+    ensureStyles();
+
+    const overlay = el("div", { class: "orionChatOverlay", id: "orionChatOverlay" });
+    const panel = el("div", { class: "orionChatPanel", id: "orionChatPanel" });
+
+    panel.appendChild(el("div", { class: "orionChatHeader" }, `
+      <div>
+        <div class="orionChatTitle">Orion • AI Web Assistant</div>
+        <div class="orionChatSub">Prezentační ukázka (web/e-shop scénáře)</div>
+      </div>
+      <button class="orionChatClose" type="button" aria-label="Zavřít">✕</button>
+    `));
+
+    const body = el("div", { class: "orionChatBody" });
+    const bubble = el("div", { class: "orionChatBubble" },
+      `Dobrý den, jsem Orion — webový asistent v prezentační ukázce. Napište dotaz, nebo klikněte na jednu z možností níže.`
+    );
+
+    const quickRow = el("div", { class: "orionChatQuickRow" });
+    const quick = [
+      "Kolik to stojí?",
+      "Co umí webový asistent?",
+      "Jak to funguje?",
+      "Dá se to nasadit na můj web?",
+      "Co když se někdo ptá mimo téma?",
+      "Chci nezávaznou konzultaci"
+    ];
+
+    quick.forEach((t) => {
+      const b = el("button", { class: "orionChatQR", type: "button" }, t);
+      b.addEventListener("click", () => handleSend(t));
+      quickRow.appendChild(b);
+    });
+
+    const inputRow = el("div", { class: "orionChatInputRow" });
+    const input = el("input", { class: "orionChatInput", placeholder: "Napište dotaz…", type: "text" });
+    const send = el("button", { class: "orionChatSend", type: "button", "aria-label": "Odeslat" }, "➤");
+    inputRow.appendChild(input);
+    inputRow.appendChild(send);
+
+    body.appendChild(bubble);
+    body.appendChild(quickRow);
+    body.appendChild(inputRow);
+    panel.appendChild(body);
+
+    const launcher = el("div", { class: "orionChatLauncher", id: "orionChatLauncher", title: "Otevřít chat" }, `
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M7 8h10M7 12h7M12 20c5 0 9-3.6 9-8s-4-8-9-8-9 3.6-9 8c0 2.2 1 4.2 2.7 5.7L5 20l4.2-1.4c.9.3 1.8.4 2.8.4Z"
+              stroke="#1e40af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    `);
+
+    function open() {
+      overlay.style.display = "block";
+      panel.style.display = "block";
+      input.focus();
+    }
+    function close() {
+      overlay.style.display = "none";
+      panel.style.display = "none";
+    }
+
+    launcher.addEventListener("click", open);
+    overlay.addEventListener("click", close);
+    panel.querySelector(".orionChatClose").addEventListener("click", close);
+
+    async function handleSend(text) {
+      if (!text) return;
+      // jednoduchý UX: vyčistí input, ale quick replies nezmizí
+      input.value = "";
+
+      const resp = await sendToN8n(text);
+      // pokud n8n neodpoví, nic nelámeme – demo UI zůstává
+      if (resp && resp.answer) {
+        bubble.innerHTML = String(resp.answer);
+      }
+    }
+
+    send.addEventListener("click", () => handleSend(input.value.trim()));
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") handleSend(input.value.trim());
+    });
+
+    document.body.appendChild(overlay);
+    document.body.appendChild(panel);
+    document.body.appendChild(launcher);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", mount);
+  } else {
+    mount();
+  }
 })();
