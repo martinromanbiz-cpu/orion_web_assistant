@@ -1,142 +1,107 @@
-/* assets/js/app.js
-   Shared layout injector:
-   - jednotná navigace na všech stránkách
-   - footer + rok
-   - aktivní záložka (active)
-   - volitelně: rendrování demo odkazů do #demoLinks (na ukazky.html)
-*/
+// assets/js/app.js
+// Shared UI (header/footer) + active nav highlighting.
+// Robustní: když něco chybí, nic nepadá. (fix: "Unexpected end of input")
+
 (function () {
   "use strict";
 
-  // --- helpers --------------------------------------------------------------
-  const qs = (sel, root = document) => root.querySelector(sel);
-  const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  // --- helpers ---
+  const byId = (id) => document.getElementById(id);
+  const safe = (fn) => {
+    try { fn(); } catch (e) { console.error("[app.js]", e); }
+  };
 
-  function currentFile() {
-    const file = (location.pathname.split("/").pop() || "index.html").split("?")[0];
-    return file === "" ? "index.html" : file;
-  }
+  const currentFile = () => {
+    const p = location.pathname.split("/").pop();
+    return p && p.length ? p : "index.html";
+  };
 
-  function safeSetHTML(el, html) {
-    if (!el) return;
-    el.innerHTML = html;
-  }
+  // --- header/footer templates ---
+  function headerHTML() {
+    return `
+      <header class="topbar">
+        <div class="container nav">
+          <a class="brand" href="./index.html" aria-label="Orion (domů)">
+            <img src="./assets/img/orion-mark.svg" alt="Orion" width="36" height="36" />
+            <span class="brandText">Orion</span>
+            <span class="badge">DEMO</span>
+          </a>
 
-  // --- inject HEADER / FOOTER ----------------------------------------------
-  const headerMount = qs("#siteHeader");
-  const footerMount = qs("#siteFooter");
+          <nav class="menu" aria-label="Hlavní navigace">
+            <a data-nav href="./index.html">Domů</a>
+            <a data-nav href="./web-assistant.html">Vyzkoušet</a>
+            <a data-nav href="./jak-to-funguje.html">Jak to funguje</a>
+            <a data-nav href="./ukazky.html">Ukázky</a>
+            <a data-nav href="./kontakt.html">Kontakt</a>
+          </nav>
 
-  // Pozn.: používáme stejné href pro všechny stránky (vždy ./soubor.html),
-  // aby to fungovalo stejně na GitHub Pages.
-  const headerHTML = `
-    <header class="topbar">
-      <div class="container nav">
-        <a class="brand" href="./index.html" aria-label="Orion (Domů)">
-          <img class="mark" src="./assets/img/orion-mark.svg" alt="Orion" width="28" height="28" />
-          <span class="brandText">Orion Web Assistant</span>
-          <span class="badge">DEMO</span>
-        </a>
-
-        <nav class="menu" aria-label="Hlavní navigace">
-          <a data-nav href="./index.html">Domů</a>
-          <a data-nav href="./web-assistant.html">Vyzkoušet</a>
-          <a data-nav href="./jak-to-funguje.html">Jak to funguje</a>
-          <a data-nav href="./ukazky.html">Ukázky</a>
-          <a data-nav href="./kontakt.html">Kontakt</a>
-        </nav>
-
-        <div class="cta">
-          <a class="btn primary" href="./kontakt.html">Nezávazná konzultace</a>
-        </div>
-      </div>
-    </header>
-  `;
-
-  const footerHTML = `
-    <footer class="footer">
-      <div class="container">
-        <div class="footerInner">
-          <div>© <span id="y"></span> Martin Roman • Orion</div>
-          <div>Prezentační ukázka • web / e-shop scénáře</div>
-        </div>
-      </div>
-    </footer>
-  `;
-
-  safeSetHTML(headerMount, headerHTML);
-  safeSetHTML(footerMount, footerHTML);
-
-  // --- active nav -----------------------------------------------------------
-  const file = currentFile();
-  qsa("[data-nav]").forEach((a) => {
-    const href = (a.getAttribute("href") || "").split("/").pop();
-    if (href === file) a.classList.add("active");
-  });
-
-  // --- year ----------------------------------------------------------------
-  const y = qs("#y");
-  if (y) y.textContent = String(new Date().getFullYear());
-
-  // --- demo links (Ukázky) -------------------------------------------------
-  // Pokud existuje #demoLinks a je definované ORION_CONFIG.DEMO_LINKS,
-  // vyrenderujeme cards/odkazy. Když neexistuje, nic se neděje.
-  const demoMount = qs("#demoLinks");
-  const cfg = window.ORION_CONFIG || {};
-  if (demoMount && Array.isArray(cfg.DEMO_LINKS)) {
-    const items = cfg.DEMO_LINKS
-      .map(
-        (it) => `
-          <div class="card">
-            <h3>${escapeHTML(it.title || "Ukázka")}</h3>
-            <p class="muted">Otevře se v novém panelu. Slouží jako doplňková ukázka.</p>
-            <a class="btn soft" target="_blank" rel="noopener" href="${escapeAttr(it.url || "#")}">Otevřít ukázku</a>
+          <div class="cta">
+            <a class="btn primary" href="./kontakt.html">Nezávazná konzultace</a>
           </div>
-        `
-      )
-      .join("");
-    demoMount.innerHTML = `<div class="grid3">${items}</div>`;
+        </div>
+      </header>
+    `;
   }
 
-  // --- small safety: if some page has legacy duplicate nav markup -----------
-  // (kdyby ti někde zůstala stará nav lišta v HTML), tak ji můžeš označit:
-  // <div data-legacy-nav> ... </div> -> a tady to odstraníme.
-  qsa("[data-legacy-nav]").forEach((el) => el.remove());
-
-  // --- utils ---------------------------------------------------------------
-  function escapeHTML(s) {
-    return String(s)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
+  function footerHTML() {
+    return `
+      <footer class="footer">
+        <div class="container">
+          <div class="footerInner">
+            <div>© <span id="y"></span> Martin Roman • Orion</div>
+            <div>Prezentační ukázka • Web/e-shop assistant</div>
+          </div>
+        </div>
+      </footer>
+    `;
   }
-  function escapeAttr(s) {
-    return escapeHTML(s).replaceAll("`", "&#096;");
-  }
-// Force-load chat widget on every page (failsafe)
-(function () {
-  if (window.__ORION_CHAT_FORCE_LOADED__) return;
-  window.__ORION_CHAT_FORCE_LOADED__ = true;
 
-  function load(src) {
-    return new Promise((res, rej) => {
-      const s = document.createElement('script');
-      s.src = src;
-      s.defer = true;
-      s.onload = res;
-      s.onerror = rej;
-      document.head.appendChild(s);
+  // --- inject UI ---
+  function injectHeaderFooter() {
+    const headerMount = byId("siteHeader");
+    const footerMount = byId("siteFooter");
+
+    if (headerMount) headerMount.innerHTML = headerHTML();
+    if (footerMount) footerMount.innerHTML = footerHTML();
+
+    // year
+    const y = byId("y");
+    if (y) y.textContent = String(new Date().getFullYear());
+  }
+
+  // --- active nav ---
+  function markActiveNav() {
+    const cur = currentFile();
+
+    document.querySelectorAll("[data-nav]").forEach((a) => {
+      const href = a.getAttribute("href") || "";
+      const file = href.split("/").pop();
+      if (file === cur) a.classList.add("active");
+      else a.classList.remove("active");
     });
   }
 
-  // když chat není namountěný, dotáhni ho natvrdo
-  setTimeout(async () => {
-    if (window.__ORION_CHAT_MOUNTED__) return;
-    try {
-      // config může být už načtený, ale nevadí
-      if (!window.ORION_CONFIG) await load('./assets/js/config.js');
-      await load('./assets/js/chat.js');
-    } catch (e) {}
-  }, 0);
+  // --- ensure chat script loaded (jen když by náhodou nebyl v HTML) ---
+  function ensureChatLoaded() {
+    const hasChat = [...document.scripts].some((s) => (s.src || "").includes("/assets/js/chat.js"));
+    if (hasChat) return;
+
+    const s = document.createElement("script");
+    s.src = "./assets/js/chat.js";
+    s.defer = true;
+    document.head.appendChild(s);
+  }
+
+  // --- init ---
+  function init() {
+    injectHeaderFooter();
+    markActiveNav();
+    ensureChatLoaded();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => safe(init));
+  } else {
+    safe(init);
+  }
 })();
