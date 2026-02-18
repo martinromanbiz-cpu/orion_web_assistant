@@ -1,28 +1,24 @@
 /* assets/js/chat.js
-   Orion chat widget – self-mount (ikonka + panel vždy), bez závislosti na HTML.
-   n8n payload: { chatInput, sessionId, sourceUrl, userAgent }
+   Robustní widget: vždy vloží ikonku + panel do stránky. Bez závislosti na HTML.
 */
-(function () {
+(() => {
   const CFG = window.ORION_CONFIG || {};
   const WEBHOOK = CFG.N8N_WEBHOOK_URL || "";
 
-  // zabrání dvojité inicializaci (kdyby se script načetl omylem víckrát)
+  // zabrání dvojité inicializaci
   if (window.__ORION_CHAT_MOUNTED__) return;
   window.__ORION_CHAT_MOUNTED__ = true;
 
-  const LS_KEY = "orion_session_id";
-  const sessionId = (localStorage.getItem(LS_KEY) || cryptoId());
-  localStorage.setItem(LS_KEY, sessionId);
+  const QUICK = [
+    "Kolik to stojí?",
+    "Co umí webový asistent?",
+    "Jak to funguje?",
+    "Je možné to nasadit na můj web?",
+    "Co když se někdo ptá mimo téma?",
+    "Mám zájem o nezávaznou konzultaci"
+  ];
 
-  function cryptoId() {
-    try {
-      return (crypto.randomUUID && crypto.randomUUID()) || ("sess_" + Math.random().toString(16).slice(2));
-    } catch {
-      return "sess_" + Math.random().toString(16).slice(2);
-    }
-  }
-
-  function el(tag, attrs = {}, text = "") {
+  function el(tag, attrs = {}, html = "") {
     const n = document.createElement(tag);
     Object.entries(attrs).forEach(([k, v]) => {
       if (k === "class") n.className = v;
@@ -30,7 +26,7 @@
       else if (k.startsWith("on") && typeof v === "function") n.addEventListener(k.slice(2), v);
       else n.setAttribute(k, v);
     });
-    if (text) n.textContent = text;
+    if (html) n.innerHTML = html;
     return n;
   }
 
@@ -40,35 +36,32 @@
     const css = `
       .orionChatLauncher{
         position:fixed; right:18px; bottom:18px; z-index:99999;
-        width:56px; height:56px; border-radius:18px;
+        width:54px; height:54px; border-radius:16px;
         background:#ffffff; border:1px solid rgba(30,58,138,.18);
-        box-shadow:0 18px 50px rgba(0,0,0,.18);
+        box-shadow:0 16px 40px rgba(0,0,0,.14);
         display:flex; align-items:center; justify-content:center;
         cursor:pointer; user-select:none;
-        transition: transform .12s ease, box-shadow .12s ease;
       }
-      .orionChatLauncher:hover{ transform: translateY(-2px); box-shadow:0 22px 60px rgba(0,0,0,.20); }
+      .orionChatLauncher:hover{ transform: translateY(-1px); }
       .orionChatLauncher svg{ width:26px; height:26px; }
 
       .orionChatOverlay{
         position:fixed; inset:0; z-index:99998;
-        background: rgba(10,14,28,.45);
+        background: rgba(10,14,28,.38);
         display:none;
       }
 
       .orionChatPanel{
-        position:fixed; right:18px; bottom:88px; z-index:99999;
+        position:fixed; right:18px; bottom:86px; z-index:99999;
         width:380px; max-width: calc(100vw - 36px);
         height:560px; max-height: calc(100vh - 120px);
-        background:#fff;
-        border:1px solid rgba(30,58,138,.14);
-        border-radius:22px;
-        box-shadow:0 30px 90px rgba(0,0,0,.22);
+        background:#ffffff; border:1px solid rgba(30,58,138,.14);
+        border-radius:22px; box-shadow:0 24px 80px rgba(0,0,0,.18);
         display:none; overflow:hidden;
       }
 
       .orionChatHeader{
-        padding:14px 14px 12px 14px;
+        padding:14px 14px 10px 14px;
         border-bottom:1px solid rgba(15,23,42,.08);
         display:flex; align-items:flex-start; justify-content:space-between;
         gap:10px;
@@ -77,24 +70,22 @@
       .orionChatSub{ margin-top:2px; color:rgba(15,23,42,.65); font-size:13px; }
 
       .orionChatClose{
-        width:36px; height:36px; border-radius:14px;
+        width:34px; height:34px; border-radius:12px;
         background:#fff; border:1px solid rgba(15,23,42,.12);
         cursor:pointer;
       }
 
       .orionChatBody{
         padding:12px 14px;
-        height: calc(100% - 68px);
+        height: calc(100% - 64px);
         display:flex; flex-direction:column; gap:10px;
       }
 
-      .orionChatMsgs{
+      .orionChatMessages{
         flex:1;
         overflow:auto;
         padding-right:6px;
-        display:flex;
-        flex-direction:column;
-        gap:10px;
+        display:flex; flex-direction:column; gap:10px;
       }
 
       .orionMsgRow{ display:flex; }
@@ -102,25 +93,24 @@
       .orionMsgRow.bot{ justify-content:flex-start; }
 
       .orionBubble{
-        max-width: 85%;
+        max-width: 88%;
         border-radius:16px;
         padding:10px 12px;
         border:1px solid rgba(30,58,138,.10);
         background:#f6f8ff;
         color:#0b1220;
-        line-height:1.35;
         white-space:pre-wrap;
       }
-      .orionMsgRow.user .orionBubble{
+      .orionBubble.user{
         background:#1e40af;
+        border-color: rgba(30,58,138,.25);
         color:#fff;
-        border-color: rgba(30,64,175,.35);
       }
 
       .orionChatQuickRow{ display:flex; flex-wrap:wrap; gap:10px; }
       .orionChatQR{
         background:#1e40af; color:#fff; border:none; cursor:pointer;
-        padding:10px 12px; border-radius:999px; font-weight:800;
+        padding:10px 12px; border-radius:999px; font-weight:700;
       }
 
       .orionChatInputRow{ display:flex; gap:10px; }
@@ -128,69 +118,54 @@
         flex:1;
         padding:12px 12px;
         border-radius:16px;
-        border:1px solid #c7c3ff;
-        background:#eef3ff; /* modro-šedá se slabým fialovým nádechem */
+        border:1px solid rgba(124,58,237,.28);          /* jemně do fialova */
+        background: rgba(241,245,249,.92);               /* modro-šedá */
         outline:none;
       }
       .orionChatSend{
-        width:48px;
-        border-radius:16px;
+        width:46px; border-radius:16px;
         border:1px solid rgba(15,23,42,.12);
-        background:#fff;
-        cursor:pointer;
-        font-weight:800;
+        background:#fff; cursor:pointer;
       }
 
       .orionChatHint{
-        margin-top:-4px;
-        font-size:12px;
-        color:rgba(15,23,42,.55);
-      }
-
-      @media (max-width: 420px){
-        .orionChatPanel{ width: calc(100vw - 24px); right:12px; bottom:84px; }
-        .orionChatLauncher{ right:12px; bottom:12px; }
+        color: rgba(15,23,42,.55);
+        font-size: 12px;
       }
     `;
 
-    const style = document.createElement("style");
-    style.id = "orionChatBaseStyles";
-    style.textContent = css;
-    document.head.appendChild(style);
+    document.head.appendChild(el("style", { id: "orionChatBaseStyles" }, css));
   }
 
-  async function callN8n(text) {
-  if (!WEBHOOK) return { ok: false, error: "Missing webhook URL" };
+  function extractAnswer(data) {
+    if (!data) return null;
+    if (typeof data === "string") return data;
+    // nejběžnější varianty
+    if (typeof data.answer === "string") return data.answer;
+    if (typeof data.output === "string") return data.output;
+    if (typeof data.text === "string") return data.text;
+    if (typeof data.message === "string") return data.message;
 
-  // Pošli více variant klíčů, ať to sedne na workflow (chatInput / message / text)
-  const payload = {
-    chatInput: text,
-    message: text,
-    text: text
-  };
+    // někdy n8n vrací pole objektů
+    if (Array.isArray(data) && data.length) {
+      const first = data[0];
+      return extractAnswer(first);
+    }
 
-  try {
-    const r = await fetch(WEBHOOK, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    const raw = await r.text().catch(() => "");
-    let data = null;
-    try { data = raw ? JSON.parse(raw) : null; } catch (_) {}
-
-    return { ok: r.ok, status: r.status, data, raw };
-  } catch (e) {
-    return { ok: false, error: String(e) };
+    return null;
   }
-}
 
+  async function sendToN8n(text) {
+    if (!WEBHOOK) return { ok: false, answer: "Webhook není nastavený (ORION_CONFIG.N8N_WEBHOOK_URL)." };
+
+    // Posíláme více klíčů, aby to sedlo na různé n8n workflow
     const payload = {
-      chatInput,
-      sessionId,
-      sourceUrl: location.href,
-      userAgent: navigator.userAgent
+      message: text,
+      chatInput: text,
+      text: text,
+      source: "orion_web_assistant",
+      page: location.pathname,
+      ts: Date.now()
     };
 
     try {
@@ -200,24 +175,20 @@
         body: JSON.stringify(payload)
       });
 
-      const raw = await r.text();
-      let json = null;
-      try { json = JSON.parse(raw); } catch {}
+      const raw = await r.text().catch(() => "");
+      let data = null;
+      try { data = raw ? JSON.parse(raw) : null; } catch { data = raw; }
 
       if (!r.ok) {
-        const msg = (json && (json.message || json.error)) || raw || ("HTTP " + r.status);
-        return { ok: false, text: `Chyba (${r.status}): ${msg}` };
+        // zobrazíme čitelně příčinu
+        const msg = extractAnswer(data) || (typeof data === "string" ? data : null) || "Server error";
+        return { ok: false, answer: `Nastala chyba (${r.status}). ${msg}` };
       }
 
-      // kompatibilita s různými výstupy z n8n
-      const answer =
-        (json && (json.output || json.answer || json.text || json.message)) ||
-        raw ||
-        "OK";
-
-      return { ok: true, text: String(answer) };
+      const ans = extractAnswer(data);
+      return { ok: true, answer: ans || "Děkuji. Zpráva byla odeslána, ale odpověď nebyla ve správném formátu." };
     } catch (e) {
-      return { ok: false, text: "Síťová chyba: " + (e && e.message ? e.message : String(e)) };
+      return { ok: false, answer: "Nepodařilo se odeslat zprávu (síť / CORS / webhook nedostupný)." };
     }
   }
 
@@ -227,40 +198,26 @@
     const overlay = el("div", { class: "orionChatOverlay", id: "orionChatOverlay" });
     const panel = el("div", { class: "orionChatPanel", id: "orionChatPanel" });
 
-    const header = el("div", { class: "orionChatHeader" });
-    const titleWrap = el("div", {});
-    const title = el("div", { class: "orionChatTitle" }, "Orion • AI Web Assistant");
-    const sub = el("div", { class: "orionChatSub" }, "Prezentační ukázka (web/e-shop scénáře)");
-    titleWrap.appendChild(title);
-    titleWrap.appendChild(sub);
-
-    const closeBtn = el("button", { class: "orionChatClose", type: "button", "aria-label": "Zavřít" }, "✕");
-    header.appendChild(titleWrap);
-    header.appendChild(closeBtn);
+    panel.appendChild(el("div", { class: "orionChatHeader" }, `
+      <div>
+        <div class="orionChatTitle">Orion • AI Web Assistant</div>
+        <div class="orionChatSub">Prezentační ukázka (web/e-shop scénáře)</div>
+      </div>
+      <button class="orionChatClose" type="button" aria-label="Zavřít">✕</button>
+    `));
 
     const body = el("div", { class: "orionChatBody" });
-    const msgs = el("div", { class: "orionChatMsgs", id: "orionChatMsgs" });
 
-    const intro = addBot("Dobrý den, jsem Orion — webový asistent v prezentační ukázce. Napište dotaz, nebo klikněte na jednu z možností níže.");
-    msgs.appendChild(intro);
+    const messages = el("div", { class: "orionChatMessages", id: "orionChatMessages" });
+    const intro = "Dobrý den, jsem Orion — webový asistent v prezentační ukázce. Napište dotaz, nebo klikněte na jednu z možností níže.";
+    messages.appendChild(renderBot(intro));
 
     const quickRow = el("div", { class: "orionChatQuickRow" });
-    const quick = [
-      "Kolik to stojí?",
-      "Co umí webový asistent?",
-      "Jak to funguje?",
-      "Dá se to nasadit na můj web?",
-      "Co když se někdo ptá mimo téma?",
-      "Chci nezávaznou konzultaci"
-    ];
-
-    quick.forEach((t) => {
+    QUICK.forEach((t) => {
       const b = el("button", { class: "orionChatQR", type: "button" }, t);
-      b.addEventListener("click", () => sendText(t));
+      b.addEventListener("click", () => handleSend(t));
       quickRow.appendChild(b);
     });
-
-    const hint = el("div", { class: "orionChatHint" }, "Tip: quick dotazy jsou schválně výrazné – ať je hned vidět demo UX.");
 
     const inputRow = el("div", { class: "orionChatInputRow" });
     const input = el("input", { class: "orionChatInput", placeholder: "Napište dotaz…", type: "text" });
@@ -268,77 +225,79 @@
     inputRow.appendChild(input);
     inputRow.appendChild(send);
 
-    body.appendChild(msgs);
-    body.appendChild(quickRow);
-    body.appendChild(hint);
-    body.appendChild(inputRow);
+    const hint = el("div", { class: "orionChatHint" }, WEBHOOK ? "" : "Pozn.: Webhook není nastavený v config.js");
 
-    panel.appendChild(header);
+    body.appendChild(messages);
+    body.appendChild(quickRow);
+    body.appendChild(inputRow);
+    body.appendChild(hint);
     panel.appendChild(body);
 
-    const launcher = document.createElement("div");
-    launcher.className = "orionChatLauncher";
-    launcher.id = "orionChatLauncher";
-    launcher.title = "Otevřít chat";
-    launcher.innerHTML = `
+    const launcher = el("div", { class: "orionChatLauncher", id: "orionChatLauncher", title: "Otevřít chat" }, `
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M7 8h10M7 12h7M12 20c5 0 9-3.6 9-8s-4-8-9-8-9 3.6-9 8c0 2.2 1 4.2 2.7 5.7L5 20l4.2-1.4c.9.3 1.8.4 2.8.4Z"
               stroke="#1e40af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-    `;
+    `);
 
     function open() {
       overlay.style.display = "block";
       panel.style.display = "block";
-      setTimeout(() => input.focus(), 0);
-      scrollBottom();
+      input.focus();
     }
     function close() {
       overlay.style.display = "none";
       panel.style.display = "none";
     }
-    function scrollBottom() {
-      msgs.scrollTop = msgs.scrollHeight;
-    }
-
-    function addRow(kind, text) {
-      const row = el("div", { class: "orionMsgRow " + kind });
-      const bubble = el("div", { class: "orionBubble" });
-      bubble.textContent = text;
-      row.appendChild(bubble);
-      return row;
-    }
-    function addBot(text) { return addRow("bot", text); }
-    function addUser(text) { return addRow("user", text); }
-
-    async function sendText(text) {
-      const t = String(text || "").trim();
-      if (!t) return;
-
-      // UI: zobraz user message hned
-      msgs.appendChild(addUser(t));
-      scrollBottom();
-      input.value = "";
-
-      // “thinking” bubble
-      const thinking = addBot("…");
-      msgs.appendChild(thinking);
-      scrollBottom();
-
-      const resp = await callN8n(t);
-
-      // nahraď thinking
-      thinking.querySelector(".orionBubble").textContent = resp.text;
-      scrollBottom();
-    }
 
     launcher.addEventListener("click", open);
     overlay.addEventListener("click", close);
-    closeBtn.addEventListener("click", close);
+    panel.querySelector(".orionChatClose").addEventListener("click", close);
 
-    send.addEventListener("click", () => sendText(input.value));
+    function renderBot(text) {
+      const row = el("div", { class: "orionMsgRow bot" });
+      row.appendChild(el("div", { class: "orionBubble bot" }, escapeHTML(text)));
+      return row;
+    }
+    function renderUser(text) {
+      const row = el("div", { class: "orionMsgRow user" });
+      row.appendChild(el("div", { class: "orionBubble user" }, escapeHTML(text)));
+      return row;
+    }
+    function escapeHTML(s) {
+      return String(s)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+    function scrollDown() {
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    async function handleSend(text) {
+      const t = String(text || "").trim();
+      if (!t) return;
+
+      messages.appendChild(renderUser(t));
+      scrollDown();
+
+      input.value = "";
+
+      const loadingRow = el("div", { class: "orionMsgRow bot" });
+      loadingRow.appendChild(el("div", { class: "orionBubble bot" }, "Odesílám…"));
+      messages.appendChild(loadingRow);
+      scrollDown();
+
+      const resp = await sendToN8n(t);
+
+      loadingRow.remove();
+      messages.appendChild(renderBot(resp.answer || "Hotovo."));
+      scrollDown();
+    }
+
+    send.addEventListener("click", () => handleSend(input.value));
     input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") sendText(input.value);
+      if (e.key === "Enter") handleSend(input.value);
     });
 
     document.body.appendChild(overlay);
