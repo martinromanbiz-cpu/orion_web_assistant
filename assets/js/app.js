@@ -1,16 +1,33 @@
 /* assets/js/app.js
-   Shared UI (header/footer) + active nav highlighting.
-   Robustní: nespadne, i když stránka něco nemá.
+   Shared UI (header/footer) + active nav highlighting + optional page helpers.
+   Robustní: nespadne, i když na stránce chybí mount point.
 */
-(() => {
-  try {
-    const currentFile = (location.pathname.split("/").pop() || "index.html").toLowerCase();
+(function () {
+  "use strict";
 
-    const headerMount = document.getElementById("siteHeader");
-    const footerMount = document.getElementById("siteFooter");
+  // Some pages historically used different mount IDs
+  const headerMount =
+    document.getElementById("siteHeader") || document.getElementById("siteheader");
+  const footerMount =
+    document.getElementById("siteFooter") || document.getElementById("sitefooter");
 
-    const headerHTML = `
-      <header class="topbar">
+  // Determine current file for active nav
+  const currentFile = (location.pathname.split("/").pop() || "index.html").split("?")[0];
+
+  function safeHTML(str) {
+    return String(str ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function injectHeader() {
+    if (!headerMount) return;
+
+    headerMount.innerHTML = `
+      <header class="topbar" id="orionTopbar">
         <div class="container nav">
           <a class="brand" href="./index.html" aria-label="Orion (domů)">
             <img src="./assets/img/orion-mark.svg" alt="Orion" width="36" height="36" />
@@ -33,33 +50,88 @@
       </header>
     `;
 
-    const footerHTML = `
+    // Add subtle shadow when scrolling (nice polish)
+    const bar = document.getElementById("orionTopbar");
+    if (bar) {
+      const onScroll = () => {
+        if (window.scrollY > 6) bar.classList.add("scrolled");
+        else bar.classList.remove("scrolled");
+      };
+      onScroll();
+      window.addEventListener("scroll", onScroll, { passive: true });
+    }
+  }
+
+  function injectFooter() {
+    if (!footerMount) return;
+
+    footerMount.innerHTML = `
       <footer class="footer">
         <div class="container">
           <div class="footerInner">
             <div>© <span id="y"></span> Martin Roman • Orion</div>
-            <div>Prezentační ukázka • Web/e-shop assistant</div>
+            <div>Prezentační ukázka AI asistenta pro weby a e-shopy</div>
           </div>
         </div>
       </footer>
     `;
 
-    if (headerMount) headerMount.innerHTML = headerHTML;
-    if (footerMount) footerMount.innerHTML = footerHTML;
-
-    // active nav
-    document.querySelectorAll("[data-nav]").forEach((a) => {
-      const href = (a.getAttribute("href") || "").toLowerCase();
-      const file = href.split("/").pop();
-      if (!file) return;
-      if (file === currentFile) a.classList.add("active");
-    });
-
-    // year
     const y = document.getElementById("y");
     if (y) y.textContent = String(new Date().getFullYear());
-  } catch (e) {
-    // nikdy neshazovat stránku kvůli navigaci
-    console.error("app.js error:", e);
+  }
+
+  function setActiveNav() {
+    document.querySelectorAll("[data-nav]").forEach((a) => {
+      const href = (a.getAttribute("href") || "").split("?")[0];
+      const file = href.split("/").pop();
+      if (file === currentFile) a.classList.add("active");
+      else a.classList.remove("active");
+    });
+  }
+
+  // Optional: render demo links on Ukázky page if #demoLinks exists
+  function renderDemoLinksIfPresent() {
+    const mount = document.getElementById("demoLinks");
+    if (!mount) return;
+
+    const cfg = window.ORION_CONFIG || {};
+    const links = Array.isArray(cfg.DEMO_LINKS) ? cfg.DEMO_LINKS : [];
+
+    if (!links.length) {
+      mount.innerHTML =
+        `<p class="muted">Externí demo odkazy nejsou nastavené v <code>assets/js/config.js</code> (pole <code>ORION_CONFIG.DEMO_LINKS</code>).</p>`;
+      return;
+    }
+
+    mount.innerHTML = links
+      .map((l) => {
+        const title = safeHTML(l.title || "Ukázka");
+        const url = safeHTML(l.url || "#");
+        return `
+          <div class="demoLinkCard">
+            <div class="demoLinkTitle">${title}</div>
+            <a class="btn" href="${url}" target="_blank" rel="noopener">Otevřít ukázku</a>
+          </div>
+        `;
+      })
+      .join("");
+  }
+
+  function boot() {
+    try {
+      injectHeader();
+      injectFooter();
+      setActiveNav();
+      renderDemoLinksIfPresent();
+    } catch (e) {
+      // nikdy neshodí stránku
+      console.error("Orion app.js failed safely:", e);
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
   }
 })();
