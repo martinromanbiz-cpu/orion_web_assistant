@@ -16,63 +16,77 @@
   <main class="container page">
     <div class="pill">Odkazy + krátký popis</div>
     <h1>Ukázky</h1>
+
     <p class="muted">
       Kliknutím se otevře nová karta. Každá ukázka demonstruje jiný styl použití (e-shop / test).
     </p>
 
-    <section class="card" style="margin-top:16px">
-      <h2 style="margin-bottom:10px">Externí demo odkazy</h2>
-      <div id="demoLinks" class="demoLinks"></div>
-      <p class="muted" style="margin-top:10px">
-        Odkazy se berou z <code>assets/js/config.js</code> (proměnná <code>DEMO_LINKS</code>).
-      </p>
-    </section>
+    <section class="card" style="margin-top:14px">
+      <h2>Externí demo odkazy</h2>
+      <p class="muted">Kliknutím se otevře nová karta.</p>
 
-    <section class="card" style="margin-top:16px">
-      <h2>Co si z toho má klient odnést</h2>
-      <ul class="list">
-        <li>asistent odpovídá konzistentně a krátce</li>
-        <li>neutíká mimo téma</li>
-        <li>vede návštěvníka k akci (kontakt / konzultace)</li>
-        <li>poptávku umí předat (handoff)</li>
-      </ul>
-    </section>
+      <div id="demoLinks" style="display:grid; gap:12px; margin-top:10px"></div>
 
-    <section class="card" style="margin-top:16px">
-      <h2>Co se dá upravit na míru</h2>
-      <ul class="list">
-        <li>texty, tone of voice, brand</li>
-        <li>quick replies (klikací dotazy)</li>
-        <li>hranice témat</li>
-        <li>napojení na interní systémy (CRM, e-mail, helpdesk)</li>
-      </ul>
-      <div style="margin-top:14px">
-        <a class="btn primary" href="./kontakt.html">Nezávazná konzultace</a>
+      <div id="demoLinksEmpty" class="muted" style="display:none; margin-top:10px">
+        Odkazy nejsou nastavené v <code>assets/js/config.js</code> (pole <code>DEMO_LINKS</code>).
       </div>
     </section>
+
+    <section class="card" style="margin-top:16px">
+      <h2>Co tato stránka ukazuje</h2>
+      <ul class="muted" style="margin-top:8px">
+        <li>princip použití asistenta v různých scénářích</li>
+        <li>krátké odpovědi a jasné hranice tématu</li>
+        <li>směřování návštěvníka k dalšímu kroku (kontakt / konzultace)</li>
+      </ul>
+    </section>
+
+    <section class="card" style="margin-top:16px">
+      <h2>Máte zájem o nasazení webového asistenta?</h2>
+      <p class="muted">
+        Nejrychlejší je krátká konzultace: typ webu, nejčastější dotazy a cílový výstup (kontakt, poptávka, objednávka).
+        Cenu neuvádím dopředu — domluvíme se podle rozsahu a požadované integrace.
+      </p>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
+        <a class="btn btn-primary" href="./kontakt.html">Nezávazná konzultace</a>
+        <a class="btn" href="./web-assistant.html">Otevřít demo</a>
+      </div>
+    </section>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const root = document.getElementById("demoLinks");
+        const empty = document.getElementById("demoLinksEmpty");
+        const links = (window.ORION_CONFIG && Array.isArray(window.ORION_CONFIG.DEMO_LINKS))
+          ? window.ORION_CONFIG.DEMO_LINKS
+          : [];
+
+        if (!root) return;
+
+        if (!links.length) {
+          if (empty) empty.style.display = "block";
+          return;
+        }
+
+        links.forEach((l) => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap">
+              <div>
+                <div style="font-weight:800; font-size:16px">${l.title || "Ukázka"}</div>
+                <div class="muted" style="margin-top:4px">${l.url || ""}</div>
+              </div>
+              <a class="btn btn-primary" href="${l.url}" target="_blank" rel="noopener">Otevřít</a>
+            </div>
+          `;
+          root.appendChild(card);
+        });
+      });
+    </script>
   </main>
 
   <div id="siteFooter"></div>
-
-  <script>
-    // Render DEMO_LINKS
-    (function () {
-      const mount = document.getElementById('demoLinks');
-      const links = (window.ORION_CONFIG && window.ORION_CONFIG.DEMO_LINKS) ? window.ORION_CONFIG.DEMO_LINKS : [];
-      if (!mount) return;
-
-      if (!links.length) {
-        mount.innerHTML = '<p class="muted">Žádné odkazy nejsou nastavené v config.js (DEMO_LINKS).</p>';
-        return;
-      }
-
-      mount.innerHTML = links.map(l => `
-        <div class="demoLinkCard">
-          <div class="demoLinkTitle">${(l.title || 'Ukázka')}</div>
-          <a class="btn" href="${l.url}" target="_blank" rel="noopener">Otevřít ukázku</a>
-        </div>
-      `).join('');
-    })();
-  </script>
 </body>
 </html>
