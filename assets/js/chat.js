@@ -159,10 +159,32 @@
     document.head.appendChild(style);
   }
 
-  async function callN8n(chatInput) {
-    if (!WEBHOOK) {
-      return { ok: false, text: "Chybí ORION_CONFIG.N8N_WEBHOOK_URL (config.js)." };
-    }
+  async function callN8n(text) {
+  if (!WEBHOOK) return { ok: false, error: "Missing webhook URL" };
+
+  // Pošli více variant klíčů, ať to sedne na workflow (chatInput / message / text)
+  const payload = {
+    chatInput: text,
+    message: text,
+    text: text
+  };
+
+  try {
+    const r = await fetch(WEBHOOK, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const raw = await r.text().catch(() => "");
+    let data = null;
+    try { data = raw ? JSON.parse(raw) : null; } catch (_) {}
+
+    return { ok: r.ok, status: r.status, data, raw };
+  } catch (e) {
+    return { ok: false, error: String(e) };
+  }
+}
 
     const payload = {
       chatInput,
