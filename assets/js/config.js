@@ -12,7 +12,7 @@
 
   // demo odkazy (Ukázky)
   window.ORION_CONFIG.DEMO_LINKS = [
-    { title: "Chat E-shop (ukázka)", url: "https://martinromanbiz-cpu.github.io/chateshop/" },
-    { title: "Chatbot Test (ukázka)", url: "https://martinromanbiz-cpu.github.io/chatbottest/" }
+    { title: "Demo E-shop (ukázka)", url: "https://martinromanbiz-cpu.github.io/chateshop/" },
+    { title: "Demo Hotel (ukázka)", url: "https://martinromanbiz-cpu.github.io/chatbottest/" }
   ];
 })();
