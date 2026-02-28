@@ -1,18 +1,15 @@
 /* assets/js/chat.js
-   Orion chat widget – robustní, bez závislosti na HTML.
-   FIX: posílá payload kompatibilní s n8n (chatInput + sessionId + history + meta)
-        + zároveň posílá i message (fallback kompatibilita).
+   Orion chat widget – robustní.
+   FIX: umí číst i n8n streaming odpověď (type:"begin"...).
 */
 (function () {
   const CFG = window.ORION_CONFIG || {};
   const WEBHOOK = CFG.N8N_WEBHOOK_URL || "";
-
   if (window.__ORION_CHAT_MOUNTED__) return;
   window.__ORION_CHAT_MOUNTED__ = true;
 
   const TIMEOUT_MS = 45000;
 
-  // sessionId kompatibilní s tvým n8n memory
   const sessionKey = "orion_sessionId";
   const sessionId =
     localStorage.getItem(sessionKey) ||
@@ -21,9 +18,7 @@
       : String(Date.now()) + "_" + Math.random().toString(16).slice(2));
   localStorage.setItem(sessionKey, sessionId);
 
-  const state = {
-    history: [] // { role: "user"|"assistant", content: "..." }
-  };
+  const state = { history: [] };
 
   function el(tag, attrs = {}, html = "") {
     const n = document.createElement(tag);
@@ -58,30 +53,50 @@
       .orionChatSend{width:46px;border-radius:16px;border:1px solid rgba(15,23,42,.12);background:#fff;cursor:pointer}
       .orionChatSend[disabled]{opacity:.6;cursor:not-allowed}
     `;
-    const style = el("style", { id: "orionChatBaseStyles" }, css);
-    document.head.appendChild(style);
+    document.head.appendChild(el("style", { id: "orionChatBaseStyles" }, css));
   }
 
-  function normalizeBotText(data) {
-    if (data == null) return "";
-    if (typeof data === "string") {
-      // někdy n8n pošle text; zkus vytáhnout JSON z textu
-      const trimmed = data.trim();
-
-      // když je to čistý JSON string
-      if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
-        try {
-          const o = JSON.parse(trimmed);
-          return (o.text ?? o.answer ?? o.reply ?? "").toString().trim();
-        } catch (_) {}
-      }
-
-      return trimmed;
+  // vytáhne text z běžného JSONu
+  function pickTextFromObject(o) {
+    if (!o || typeof o !== "object") return "";
+    const cands = [
+      o.text, o.answer, o.reply,
+      o.output?.text, o.output?.answer, o.output?.reply,
+      o.data?.text, o.data?.answer, o.data?.reply,
+      o.content, o.message
+    ];
+    for (const c of cands) {
+      if (typeof c === "string" && c.trim()) return c.trim();
     }
+    return "";
+  }
 
-    let o = data;
-    if (typeof data.output === "object" && data.output) o = data.output;
-    return (o.text ?? o.answer ?? o.reply ?? "").toString().trim();
+  // vytáhne text z n8n streamu (řada JSON eventů)
+  function pickTextFromStreamText(streamText) {
+    if (!streamText) return "";
+    const lines = String(streamText).split("\n").map(l => l.trim()).filter(Boolean);
+
+    let lastUseful = "";
+    for (const line of lines) {
+      // někdy to má prefix "data: ..."
+      const raw = line.startsWith("data:") ? line.slice(5).trim() : line;
+
+      if (!raw.startsWith("{")) continue;
+      try {
+        const obj = JSON.parse(raw);
+
+        // typicky: type:"message"/"output"/"end"…
+        const t = pickTextFromObject(obj);
+        if (t) lastUseful = t;
+
+        // někdy n8n zabalí obsah do metadata / message
+        const t2 = pickTextFromObject(obj?.metadata);
+        if (t2) lastUseful = t2;
+      } catch (_) {
+        // ignore
+      }
+    }
+    return lastUseful.trim();
   }
 
   async function sendToN8n(userText) {
@@ -91,11 +106,9 @@
     const t = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
     try {
-      // ✅ Posíláme kompatibilně: chatInput + sessionId + history + meta
-      // ✅ Plus fallback: message (kdyby někde byla stará větev)
       const payload = {
         chatInput: userText,
-        message: userText,
+        message: userText, // fallback
         sessionId,
         history: state.history.slice(-12),
         meta: { source: "orion_web_assistant", page: location.pathname }
@@ -112,14 +125,26 @@
       });
 
       const contentType = (r.headers.get("content-type") || "").toLowerCase();
-      const raw = contentType.includes("application/json") ? await r.json().catch(() => null) : await r.text();
+      const rawText = await r.text();
 
       if (!r.ok) {
-        return { ok: false, text: "Došlo k chybě při zpracování dotazu. Zkuste to prosím znovu.", raw };
+        return { ok: false, text: "Došlo k chybě při zpracování dotazu. Zkuste to prosím znovu.", raw: rawText };
       }
 
-      const botText = normalizeBotText(raw);
-      return { ok: true, text: botText || "Upřesníte prosím dotaz k webu/e-shopu?", raw };
+      // 1) zkus klasický JSON
+      let parsed = null;
+      try { parsed = JSON.parse(rawText); } catch (_) {}
+
+      let botText = parsed ? pickTextFromObject(parsed) : "";
+
+      // 2) pokud nic, zkus stream parser
+      if (!botText) botText = pickTextFromStreamText(rawText);
+
+      return {
+        ok: true,
+        text: botText || "Upřesníte prosím dotaz k webu/e-shopu?",
+        raw: contentType.includes("json") ? parsed : rawText
+      };
     } catch (e) {
       const isAbort = e && String(e.name) === "AbortError";
       return {
