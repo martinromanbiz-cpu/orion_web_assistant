@@ -1,12 +1,13 @@
 /* assets/js/chat.js
-   Robustní widget: vždy vloží ikonku + panel do stránky. Bez závislosti na HTML.
-   FIX:
-   - posílá do n8n i chatInput + sessionId (kompatibilní s n8n Chat Trigger)
-   - zachová sessionId v localStorage (konzistence/paměť)
-   - quick replies NEzmizí
-   - odpovědi se renderují do messages logu (pod quick replies)
+   Orion chat widget (robustní):
+   - vždy vloží ikonku + overlay + panel do stránky (bez závislosti na HTML)
+   - struktura: Header → Messages (scroll) → Quick replies → Input
+   - quick replies NEzmizí po odeslání
+   - odpovědi se přidávají DOLŮ do konverzace
 */
 (function () {
+  "use strict";
+
   const CFG = window.ORION_CONFIG || {};
   const WEBHOOK = CFG.N8N_WEBHOOK_URL || "";
 
@@ -14,20 +15,7 @@
   if (window.__ORION_CHAT_MOUNTED__) return;
   window.__ORION_CHAT_MOUNTED__ = true;
 
-  // === sessionId (persist) ===
-  const SESSION_KEY = "orion_session_id";
-  function getSessionId() {
-    try {
-      const existing = localStorage.getItem(SESSION_KEY);
-      if (existing) return existing;
-      const sid = "web-" + Math.random().toString(16).slice(2) + Date.now().toString(16);
-      localStorage.setItem(SESSION_KEY, sid);
-      return sid;
-    } catch (e) {
-      return "web-" + Math.random().toString(16).slice(2) + Date.now().toString(16);
-    }
-  }
-
+  // helpers
   function el(tag, attrs = {}, html = "") {
     const n = document.createElement(tag);
     Object.entries(attrs).forEach(([k, v]) => {
@@ -40,10 +28,15 @@
     return n;
   }
 
+  function safeText(x) {
+    return String(x ?? "").trim();
+  }
+
   function ensureStyles() {
     if (document.getElementById("orionChatBaseStyles")) return;
 
     const css = `
+      /* Launcher */
       .orionChatLauncher{
         position:fixed; right:18px; bottom:18px; z-index:99999;
         width:54px; height:54px; border-radius:16px;
@@ -51,276 +44,249 @@
         box-shadow:0 16px 40px rgba(0,0,0,.14);
         display:flex; align-items:center; justify-content:center;
         cursor:pointer; user-select:none;
+        transition: transform .12s ease, box-shadow .12s ease;
       }
-      .orionChatLauncher:hover{ transform: translateY(-1px); }
+      .orionChatLauncher:hover{
+        transform: translateY(-1px);
+        box-shadow:0 18px 46px rgba(0,0,0,.16);
+      }
       .orionChatLauncher svg{ width:26px; height:26px; }
 
+      /* Overlay + panel */
       .orionChatOverlay{
         position:fixed; inset:0; z-index:99998;
         background: rgba(10,14,28,.35);
         display:none;
+        backdrop-filter: blur(1px);
       }
       .orionChatPanel{
         position:fixed; right:18px; bottom:86px; z-index:99999;
-        width:360px; max-width: calc(100vw - 36px);
-        height:520px; max-height: calc(100vh - 120px);
+        width:380px; max-width: calc(100vw - 36px);
+        height:560px; max-height: calc(100vh - 120px);
         background:#fff; border:1px solid rgba(30,58,138,.14);
         border-radius:22px; box-shadow:0 24px 80px rgba(0,0,0,.18);
         display:none; overflow:hidden;
       }
+
+      /* Header */
       .orionChatHeader{
         padding:14px 14px 10px 14px;
         border-bottom:1px solid rgba(15,23,42,.08);
         display:flex; align-items:flex-start; justify-content:space-between;
         gap:10px;
+        background: linear-gradient(180deg, rgba(245,248,255,1) 0%, rgba(255,255,255,1) 70%);
       }
-      .orionChatTitle{ font-weight:800; font-size:16px; line-height:1.2; }
+      .orionChatTitle{ font-weight:900; font-size:16px; line-height:1.2; color:#0b1220; }
       .orionChatSub{ margin-top:2px; color:rgba(15,23,42,.65); font-size:13px; }
       .orionChatClose{
-        width:34px; height:34px; border-radius:12px;
+        width:36px; height:36px; border-radius:14px;
         background:#fff; border:1px solid rgba(15,23,42,.12);
         cursor:pointer;
+        transition: transform .12s ease, background .12s ease;
       }
+      .orionChatClose:hover{ transform: scale(1.02); background:#f8fafc; }
 
+      /* Body layout */
       .orionChatBody{
         padding:12px 14px;
-        height: calc(100% - 64px);
-        display:flex; flex-direction:column;
+        height: calc(100% - 66px);
+        display:flex;
+        flex-direction:column;
         gap:10px;
+        overflow:hidden; /* důležité */
       }
 
-      .orionChatIntro{
-        background:#f6f8ff; border:1px solid rgba(30,58,138,.10);
-        border-radius:16px; padding:10px 12px; color:#0b1220;
-      }
-
-      .orionChatQuickRow{ display:flex; flex-wrap:wrap; gap:10px; }
-      .orionChatQR{
-        background:#1e40af; color:#fff; border:none; cursor:pointer;
-        padding:10px 12px; border-radius:999px; font-weight:700;
-      }
-
+      /* Scrollovatelná konverzace */
       .orionChatMessages{
         flex:1;
         overflow:auto;
-        display:flex; flex-direction:column;
+        padding-right:6px;
+        display:flex;
+        flex-direction:column;
         gap:10px;
-        padding-right:2px;
       }
-      .orionChatMsg{
+      .orionChatMessages::-webkit-scrollbar{ width:10px; }
+      .orionChatMessages::-webkit-scrollbar-thumb{
+        background: rgba(15,23,42,.10);
+        border-radius: 999px;
+        border:3px solid transparent;
+        background-clip: content-box;
+      }
+
+      /* Bubliny */
+      .orionMsg{
         max-width: 92%;
         border-radius:16px;
         padding:10px 12px;
-        border:1px solid rgba(15,23,42,.10);
-        background:#ffffff;
+        border:1px solid rgba(30,58,138,.10);
+        background:#f6f8ff;
         color:#0b1220;
-        line-height:1.35;
+        white-space:pre-wrap;
+        word-break:break-word;
       }
-      .orionChatMsg.user{
+      .orionMsg.user{
         margin-left:auto;
         background:#1e40af;
+        color:#fff;
         border-color: rgba(30,58,138,.20);
-        color:#ffffff;
-      }
-      .orionChatMsg.bot{
-        margin-right:auto;
-        background:#f6f8ff;
-        border-color: rgba(30,58,138,.10);
-      }
-      .orionChatTyping{
-        opacity:.8;
-        font-style: italic;
       }
 
-      .orionChatInputRow{ display:flex; gap:10px; }
+      /* Quick replies */
+      .orionChatQuickRow{
+        display:flex;
+        flex-wrap:wrap;
+        gap:10px;
+        max-height: 160px;
+        overflow:auto;
+        padding-right:6px;
+      }
+      .orionChatQuickRow::-webkit-scrollbar{ width:10px; }
+      .orionChatQuickRow::-webkit-scrollbar-thumb{
+        background: rgba(15,23,42,.10);
+        border-radius: 999px;
+        border:3px solid transparent;
+        background-clip: content-box;
+      }
+      .orionChatQR{
+        background:#1e40af; color:#fff; border:none; cursor:pointer;
+        padding:10px 12px; border-radius:999px; font-weight:800;
+        transition: transform .10s ease, filter .10s ease;
+      }
+      .orionChatQR:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+
+      /* Input row */
+      .orionChatInputRow{
+        margin-top:auto;
+        display:flex;
+        gap:10px;
+      }
       .orionChatInput{
-        flex:1; padding:12px 12px; border-radius:16px;
-        border:1px solid #c9c5ff; background:#eef3ff; outline:none;
+        flex:1;
+        padding:12px 12px;
+        border-radius:16px;
+        border:1px solid #c9c5ff;
+        background:#eef3ff;
+        outline:none;
+      }
+      .orionChatInput:focus{
+        border-color: rgba(30,58,138,.35);
+        box-shadow: 0 0 0 4px rgba(30,58,138,.10);
       }
       .orionChatSend{
-        width:46px; border-radius:16px; border:1px solid rgba(15,23,42,.12);
-        background:#fff; cursor:pointer;
+        width:50px;
+        border-radius:16px;
+        border:1px solid rgba(15,23,42,.12);
+        background:#fff;
+        cursor:pointer;
+        font-weight:900;
+      }
+      .orionChatSend:hover{ background:#f8fafc; }
+
+      /* Mobile: panel jako bottom sheet */
+      @media (max-width: 520px){
+        .orionChatPanel{
+          right:12px; left:12px;
+          bottom:78px;
+          width:auto;
+          height: 72vh;
+          max-height: 72vh;
+        }
+        .orionChatLauncher{
+          right:12px; bottom:12px;
+        }
       }
     `;
+
     const style = el("style", { id: "orionChatBaseStyles" }, css);
     document.head.appendChild(style);
   }
 
-  function tryParseJson(s) {
-    try {
-      return JSON.parse(s);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  // n8n někdy vrací JSON, někdy “stream” (více JSON řádků). Zkusíme z toho vytáhnout text.
-  function extractN8nAnswer(raw) {
-    const trimmed = String(raw || "").trim();
-    if (!trimmed) return "";
-
-    const direct = tryParseJson(trimmed);
-    if (direct) {
-      return (
-        direct.answer ||
-        direct.output ||
-        direct.text ||
-        (direct.data && (direct.data.answer || direct.data.output || direct.data.text)) ||
-        ""
-      );
-    }
-
-    const lines = trimmed.split(/\r?\n/).map((x) => x.trim()).filter(Boolean);
-    let chunks = [];
-    let last = null;
-
-    for (const ln of lines) {
-      const obj = tryParseJson(ln);
-      if (!obj) continue;
-      last = obj;
-
-      const d = obj.data || obj.delta || obj.payload || null;
-      const t =
-        obj.answer || obj.output || obj.text ||
-        (d && (d.answer || d.output || d.text || d.content || d.message)) ||
-        null;
-
-      if (typeof t === "string" && t.trim()) chunks.push(t);
-    }
-
-    if (chunks.length) return chunks.join("").trim();
-    if (last) {
-      const d = last.data || {};
-      const t = last.answer || last.output || last.text || d.answer || d.output || d.text;
-      if (typeof t === "string") return t.trim();
-    }
-    return trimmed;
-  }
-
-  function extractAnswer(resp) {
-    if (!resp) return "";
-    if (typeof resp === "string") return extractN8nAnswer(resp);
-
-    if (typeof resp.answer === "string") return resp.answer;
-    if (typeof resp.text === "string") return resp.text;
-    if (typeof resp.message === "string") return resp.message;
-    if (typeof resp.output === "string") return resp.output;
-
-    if (resp.output && typeof resp.output === "object") {
-      if (typeof resp.output.answer === "string") return resp.output.answer;
-      if (typeof resp.output.text === "string") return resp.output.text;
-      if (typeof resp.output.message === "string") return resp.output.message;
-    }
-
-    if (Array.isArray(resp) && resp.length) return extractAnswer(resp[0]);
-
-    if (typeof resp.raw === "string") return extractN8nAnswer(resp.raw);
-    if (typeof resp.data === "string") return extractN8nAnswer(resp.data);
-
-    try {
-      return extractN8nAnswer(JSON.stringify(resp));
-    } catch {
-      return "";
-    }
-  }
-
   async function sendToN8n(text) {
-    if (!WEBHOOK) return { ok: false, status: 0, error: "missing_webhook" };
+    if (!WEBHOOK) return { ok: false, error: "missing_webhook" };
 
     try {
       const r = await fetch(WEBHOOK, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: JSON.stringify({
-          // DŮLEŽITÉ: kompatibilita s n8n Chat Trigger
-          chatInput: text,
-          // fallback pro případ, že někde čteš “message”
-          message: text,
-          sessionId: getSessionId(),
-          history: [],
-          meta: { source: "orion-web" },
-        }),
+        headers: { "Content-Type": "application/json" },
+        // držíme jednoduchý payload (n8n si to bere jako message)
+        body: JSON.stringify({ message: text })
       });
 
       const raw = await r.text();
-      let data = tryParseJson(raw);
-      if (!data) data = raw;
+      let data = null;
+      try { data = raw ? JSON.parse(raw) : null; } catch (_) {}
 
-      if (!r.ok) return { ok: false, status: r.status, error: raw || "request_failed" };
-      return { ok: true, status: r.status, data };
+      if (!r.ok) {
+        return { ok: false, status: r.status, data, raw };
+      }
+      return { ok: true, status: r.status, data, raw };
     } catch (e) {
-      return { ok: false, status: 0, error: String(e && e.message ? e.message : e) };
+      return { ok: false, error: String(e?.message || e) };
     }
   }
 
   function mount() {
     ensureStyles();
 
+    // elements
     const overlay = el("div", { class: "orionChatOverlay", id: "orionChatOverlay" });
     const panel = el("div", { class: "orionChatPanel", id: "orionChatPanel" });
 
+    // header
     panel.appendChild(
       el(
         "div",
         { class: "orionChatHeader" },
         `
-      <div>
-        <div class="orionChatTitle">Orion • AI Web Assistant</div>
-        <div class="orionChatSub">Prezentační ukázka (web/e-shop scénáře)</div>
-      </div>
-      <button class="orionChatClose" type="button" aria-label="Zavřít">✕</button>
-    `
+        <div>
+          <div class="orionChatTitle">Orion • AI Web Assistant</div>
+          <div class="orionChatSub">Prezentační ukázka (web/e-shop scénáře)</div>
+        </div>
+        <button class="orionChatClose" type="button" aria-label="Zavřít">✕</button>
+      `
       )
     );
 
     const body = el("div", { class: "orionChatBody" });
 
-    const introEl = el(
-      "div",
-      { class: "orionChatIntro" },
-      `Dobrý den, jsem Orion — webový asistent v prezentační ukázce. Napište dotaz, nebo klikněte na jednu z možností níže.`
-    );
+    // messages scroll
+    const messages = el("div", { class: "orionChatMessages", id: "orionChatMessages" });
 
-    // Quick replies (zůstávají)
+    // intro assistant message (VYKÁNÍ)
+    const intro =
+      "Dobrý den, jsem Orion — webový asistent v prezentační ukázce. Napište dotaz, nebo klikněte na jednu z možností níže.";
+    messages.appendChild(el("div", { class: "orionMsg assistant" }, intro));
+
+    // quick replies
     const quickRow = el("div", { class: "orionChatQuickRow" });
+
     const quick = [
       "Kolik to stojí?",
       "Co umí webový asistent?",
       "Jak to funguje?",
       "Dá se to nasadit na můj web?",
       "Co když se někdo ptá mimo téma?",
-      "Mám zájem o nezávaznou konzultaci",
+      "Mám zájem o nezávaznou konzultaci"
     ];
-    quick.forEach((t) => {
-      const b = el("button", { class: "orionChatQR", type: "button" }, t);
-      b.addEventListener("click", () => handleSend(t));
-      quickRow.appendChild(b);
-    });
 
-    // Messages log (odpovědi se přidávají sem)
-    const messages = el("div", { class: "orionChatMessages", id: "orionChatMessages" });
-
-    // Input row
+    // input
     const inputRow = el("div", { class: "orionChatInputRow" });
     const input = el("input", {
       class: "orionChatInput",
       placeholder: "Napište dotaz…",
       type: "text",
-      autocomplete: "off",
+      autocomplete: "off"
     });
-    const send = el("button", { class: "orionChatSend", type: "button", "aria-label": "Odeslat" }, "➤");
+    const sendBtn = el("button", { class: "orionChatSend", type: "button", "aria-label": "Odeslat" }, "➤");
     inputRow.appendChild(input);
-    inputRow.appendChild(send);
+    inputRow.appendChild(sendBtn);
 
-    body.appendChild(introEl);
-    body.appendChild(quickRow);
     body.appendChild(messages);
+    body.appendChild(quickRow);
     body.appendChild(inputRow);
     panel.appendChild(body);
 
+    // launcher
     const launcher = el(
       "div",
       { class: "orionChatLauncher", id: "orionChatLauncher", title: "Otevřít chat" },
@@ -332,10 +298,23 @@
     `
     );
 
+    // message helpers
+    function addMessage(role, text) {
+      const t = safeText(text);
+      if (!t) return;
+
+      const cls = role === "user" ? "orionMsg user" : "orionMsg assistant";
+      messages.appendChild(el("div", { class: cls }, t));
+
+      // autoscroll dolů
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    // open/close
     function open() {
       overlay.style.display = "block";
       panel.style.display = "block";
-      input.focus();
+      setTimeout(() => input.focus(), 0);
     }
     function close() {
       overlay.style.display = "none";
@@ -346,45 +325,61 @@
     overlay.addEventListener("click", close);
     panel.querySelector(".orionChatClose").addEventListener("click", close);
 
-    function pushMessage(who, text) {
-      const m = el("div", { class: `orionChatMsg ${who === "user" ? "user" : "bot"}` }, String(text));
-      messages.appendChild(m);
-      messages.scrollTop = messages.scrollHeight;
-      return m;
-    }
-
+    // send handler
     async function handleSend(text) {
-      const q = String(text || "").trim();
-      if (!q) return;
+      const t = safeText(text);
+      if (!t) return;
 
-      pushMessage("user", q);
+      addMessage("user", t);
       input.value = "";
 
-      const typing = pushMessage("assistant", "…");
-      typing.classList.add("orionChatTyping");
+      const res = await sendToN8n(t);
 
-      const res = await sendToN8n(q);
+      // OK response handling (přizpůsobené na běžné n8n výstupy)
+      if (res.ok) {
+        // preferujeme data.answer, pak data.text, pak data.message, pak raw
+        const d = res.data || {};
+        const answer =
+          safeText(d.answer) ||
+          safeText(d.text) ||
+          safeText(d.message) ||
+          safeText(res.raw);
 
-      // remove typing
-      typing.remove();
-
-      if (!res.ok) {
-        pushMessage("assistant", `Nastala chyba (${res.status}). Prosím zkuste to znovu za chvíli.`);
+        if (answer) addMessage("assistant", answer);
+        else addMessage("assistant", "Děkuji. Pokud chcete, napište prosím, zda jde o e-shop nebo firemní web a co má asistent řešit nejčastěji.");
         return;
       }
 
-      const answer = extractAnswer(res.data);
-      pushMessage("assistant", answer || "Děkuji. Je to spíše e-shop, nebo firemní web?");
+      // error handling (nezlomí UI)
+      if (res.status === 500) {
+        addMessage("assistant", "Nastala technická chyba na serveru. Zkuste to prosím za chvíli znovu.");
+      } else if (res.status) {
+        addMessage("assistant", `Nastala technická chyba (${res.status}). Zkuste to prosím ještě jednou.`);
+      } else {
+        addMessage("assistant", "Nepodařilo se spojit se serverem. Zkuste to prosím ještě jednou.");
+      }
     }
 
-    send.addEventListener("click", () => handleSend(input.value));
+    // quick replies buttons
+    quick.forEach((t) => {
+      const b = el("button", { class: "orionChatQR", type: "button" }, t);
+      b.addEventListener("click", () => handleSend(t));
+      quickRow.appendChild(b);
+    });
+
+    // input events
+    sendBtn.addEventListener("click", () => handleSend(input.value));
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") handleSend(input.value);
     });
 
+    // mount to DOM
     document.body.appendChild(overlay);
     document.body.appendChild(panel);
     document.body.appendChild(launcher);
+
+    // initial scroll bottom
+    messages.scrollTop = messages.scrollHeight;
   }
 
   if (document.readyState === "loading") {
