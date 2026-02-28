@@ -1,21 +1,18 @@
 /* assets/js/app.js
-   Orion – Shared header/footer + active nav + demo links
-   + HARD FIX pro layout chatu (bez úprav chat.js)
+   Shared UI (header/footer) + active nav highlighting + Ukázky demo links.
+   DŮLEŽITÉ: app.js NESMÍ upravovat chat layout. Chat řeší pouze assets/js/chat.js.
 */
 (function () {
   "use strict";
 
-  // -------- helpers ----------
-  const byId = (id) => document.getElementById(id);
-
   const headerMount =
-    byId("siteHeader") || byId("siteheader") || byId("SiteHeader");
+    document.getElementById("siteHeader") || document.getElementById("siteheader");
   const footerMount =
-    byId("siteFooter") || byId("sitefooter") || byId("SiteFooter");
+    document.getElementById("siteFooter") || document.getElementById("sitefooter");
 
   const currentFile = (location.pathname.split("/").pop() || "index.html").split("?")[0];
 
-  function esc(str) {
+  function safeHTML(str) {
     return String(str ?? "")
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
@@ -24,7 +21,6 @@
       .replaceAll("'", "&#039;");
   }
 
-  // -------- header/footer ----------
   function injectHeader() {
     if (!headerMount) return;
 
@@ -52,7 +48,8 @@
       </header>
     `;
 
-    const bar = byId("orionTopbar");
+    // jemný stín při scrollu
+    const bar = document.getElementById("orionTopbar");
     if (bar) {
       const onScroll = () => {
         if (window.scrollY > 6) bar.classList.add("scrolled");
@@ -77,7 +74,7 @@
       </footer>
     `;
 
-    const y = byId("y");
+    const y = document.getElementById("y");
     if (y) y.textContent = String(new Date().getFullYear());
   }
 
@@ -90,9 +87,9 @@
     });
   }
 
-  // -------- Ukázky: demo links ----------
+  // Ukázky: render odkazy z ORION_CONFIG.DEMO_LINKS do #demoLinks
   function renderDemoLinksIfPresent() {
-    const mount = byId("demoLinks");
+    const mount = document.getElementById("demoLinks");
     if (!mount) return;
 
     const cfg = window.ORION_CONFIG || {};
@@ -100,14 +97,14 @@
 
     if (!links.length) {
       mount.innerHTML =
-        `<p class="muted">Externí demo odkazy nejsou nastavené v <code>assets/js/config.js</code> (<code>ORION_CONFIG.DEMO_LINKS</code>).</p>`;
+        `<p class="muted">Externí demo odkazy nejsou nastavené v <code>assets/js/config.js</code> (pole <code>ORION_CONFIG.DEMO_LINKS</code>).</p>`;
       return;
     }
 
     mount.innerHTML = links
       .map((l) => {
-        const title = esc(l.title || "Ukázka");
-        const url = esc(l.url || "#");
+        const title = safeHTML(l.title || "Ukázka");
+        const url = safeHTML(l.url || "#");
         return `
           <div class="demoLinkCard">
             <div class="demoLinkTitle">${title}</div>
@@ -118,95 +115,12 @@
       .join("");
   }
 
-  // -------- HARD FIX: chat layout ----------
-  // Cíl: ať konverzace je vidět a scrolluje se “message area”, ne půlka panelu.
-  function patchChatLayoutOnce() {
-    const panel =
-      byId("orionChatPanel") ||
-      document.querySelector(".orionChatPanel") ||
-      document.querySelector("[data-orion-chat-panel]");
-
-    if (!panel) return false;
-
-    // panel jako flex sloupec
-    panel.style.display = panel.style.display || ""; // nechat řídit chat.js (open/close)
-    panel.style.overflow = "hidden";
-    panel.style.height = panel.style.height || "";
-    panel.style.maxHeight = "calc(100vh - 120px)";
-    panel.style.minHeight = "420px";
-    panel.style.boxSizing = "border-box";
-
-    // najdi v panelu části (podle tvých className z chat.js)
-    const body =
-      panel.querySelector(".orionChatBody") ||
-      panel.querySelector("[data-orion-body]") ||
-      panel;
-
-    // body musí být flex sloupec, aby šla konverzace do flex:1
-    body.style.display = "flex";
-    body.style.flexDirection = "column";
-    body.style.height = "100%";
-    body.style.minHeight = "0"; // důležité pro scroll
-
-    // header + input + quick
-    const header = panel.querySelector(".orionChatHeader");
-    const inputRow = panel.querySelector(".orionChatInputRow");
-    const quickRow = panel.querySelector(".orionChatQuickRow");
-
-    // message area: zkus najít “messages” / “log”
-    // (když nemáš message list, aspoň bublina dostane scroll)
-    const messages =
-      panel.querySelector("#orionChatMessages") ||
-      panel.querySelector(".orionChatMessages") ||
-      panel.querySelector(".chatMessages") ||
-      panel.querySelector(".messages") ||
-      panel.querySelector(".orionChatBubble"); // fallback
-
-    if (messages) {
-      messages.style.flex = "1";
-      messages.style.minHeight = "0";
-      messages.style.overflowY = "auto";
-      messages.style.overflowX = "hidden";
-      messages.style.paddingBottom = "8px";
-    }
-
-    // quickRow má být pod messages (ale nad input)
-    if (quickRow) {
-      quickRow.style.flex = "0 0 auto";
-      quickRow.style.marginTop = "10px";
-    }
-
-    if (inputRow) {
-      inputRow.style.flex = "0 0 auto";
-      inputRow.style.marginTop = "10px";
-    }
-
-    // pokud panel obsahuje header, tak zbytek musí mít minHeight:0 (scroll fix)
-    if (header) {
-      header.style.flex = "0 0 auto";
-    }
-
-    return true;
-  }
-
-  function patchChatLayout() {
-    // opakovaně párkrát, protože chat.js mountuje později
-    let tries = 0;
-    const timer = setInterval(() => {
-      tries += 1;
-      const ok = patchChatLayoutOnce();
-      if (ok || tries >= 25) clearInterval(timer);
-    }, 200);
-  }
-
-  // -------- boot ----------
   function boot() {
     try {
       injectHeader();
       injectFooter();
       setActiveNav();
       renderDemoLinksIfPresent();
-      patchChatLayout();
     } catch (e) {
       console.error("Orion app.js failed safely:", e);
     }
