@@ -1,8 +1,12 @@
 /* assets/js/chat.js
-   Orion chat widget – chat log + persistent quick replies.
+   Widget: vždy vloží ikonku + panel do stránky (nezávisle na HTML).
+   - Vykání (stejně jako web)
+   - Odpovědi se přidávají do historie (nepřepisují úvodní bublinu)
+   - Quick replies zůstávají
+   - Posílá payload pro n8n chat trigger: { chatInput, sessionId, history, meta }
 */
 (function () {
-  const CFG = (window.ORION_CONFIG || {});
+  const CFG = window.ORION_CONFIG || {};
   const WEBHOOK = CFG.N8N_WEBHOOK_URL || "";
 
   if (window.__ORION_CHAT_MOUNTED__) return;
@@ -17,6 +21,16 @@
     });
     if (html) n.innerHTML = html;
     return n;
+  }
+
+  function getSessionId() {
+    const key = "orion_session_id";
+    let id = localStorage.getItem(key);
+    if (!id) {
+      id = "web-" + Math.random().toString(16).slice(2) + "-" + Date.now();
+      localStorage.setItem(key, id);
+    }
+    return id;
   }
 
   function ensureStyles() {
@@ -36,9 +50,10 @@
 
       .orionChatOverlay{
         position:fixed; inset:0; z-index:99998;
-        background: rgba(10,14,28,.35);
+        background: rgba(10,14,28,.38);
         display:none;
       }
+
       .orionChatPanel{
         position:fixed; right:18px; bottom:86px; z-index:99999;
         width:380px; max-width: calc(100vw - 36px);
@@ -47,6 +62,7 @@
         border-radius:22px; box-shadow:0 24px 80px rgba(0,0,0,.18);
         display:none; overflow:hidden;
       }
+
       .orionChatHeader{
         padding:14px 14px 10px 14px;
         border-bottom:1px solid rgba(15,23,42,.08);
@@ -62,103 +78,99 @@
       }
 
       .orionChatBody{
-        padding:12px 14px;
         height: calc(100% - 64px);
-        display:flex; flex-direction:column; gap:10px;
+        display:flex; flex-direction:column;
       }
 
-      .orionChatMessages{
-        flex:1;
+      .orionChatLog{
+        padding:12px 14px;
         overflow:auto;
         display:flex;
         flex-direction:column;
         gap:10px;
-        padding-right:4px;
       }
 
       .orionMsg{
-        max-width: 86%;
+        max-width: 92%;
         border-radius:16px;
         padding:10px 12px;
         border:1px solid rgba(30,58,138,.10);
         background:#f6f8ff;
         color:#0b1220;
-        line-height:1.35;
-        word-break: break-word;
       }
       .orionMsg.user{
         align-self:flex-end;
         background:#1e40af;
         color:#fff;
-        border: none;
+        border-color: rgba(30,58,138,.25);
       }
 
-      .orionChatQuickRow{
+      .orionChatQuickWrap{
+        padding:0 14px 10px 14px;
         display:flex;
-        flex-wrap:wrap;
+        flex-direction:column;
         gap:10px;
       }
+
+      .orionChatQuickRow{ display:flex; flex-wrap:wrap; gap:10px; }
       .orionChatQR{
-        background:#1e40af;
-        color:#fff;
-        border:none;
-        cursor:pointer;
-        padding:10px 12px;
-        border-radius:999px;
-        font-weight:700;
+        background:#1e40af; color:#fff; border:none; cursor:pointer;
+        padding:10px 12px; border-radius:999px; font-weight:700;
       }
 
       .orionChatInputRow{
-        display:flex;
-        gap:10px;
+        display:flex; gap:10px;
+        padding:0 14px 14px 14px;
       }
       .orionChatInput{
-        flex:1;
-        padding:12px 12px;
-        border-radius:16px;
-        border:1px solid #c9c5ff;
-        background:#eef3ff;
-        outline:none;
+        flex:1; padding:12px 12px; border-radius:16px;
+        border:1px solid #c9c5ff; background:#eef3ff; outline:none;
       }
       .orionChatSend{
-        width:46px;
-        border-radius:16px;
-        border:1px solid rgba(15,23,42,.12);
-        background:#fff;
-        cursor:pointer;
+        width:46px; border-radius:16px; border:1px solid rgba(15,23,42,.12);
+        background:#fff; cursor:pointer;
       }
+      .orionChatSend[disabled]{ opacity:.55; cursor:not-allowed; }
     `;
-    document.head.appendChild(el("style", { id: "orionChatBaseStyles" }, css));
+
+    const style = el("style", { id: "orionChatBaseStyles" }, css);
+    document.head.appendChild(style);
   }
 
   async function sendToN8n(text) {
-    if (!WEBHOOK) {
-      return { ok: false, answer: "Chybí N8N webhook URL v config.js." };
-    }
+    if (!WEBHOOK) return { ok: false, answer: "Chat webhook není nastavený." };
+
+    const payload = {
+      chatInput: text,
+      sessionId: getSessionId(),
+      history: [],
+      meta: { source: "orion_web" }
+    };
+
     try {
       const r = await fetch(WEBHOOK, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text })
+        body: JSON.stringify(payload)
       });
 
-      const raw = await r.text();
-
+      // n8n může vracet různé tvary; zkusíme vytěžit text rozumně
+      const raw = await r.text().catch(() => "");
       if (!r.ok) {
-        return { ok: false, answer: `Nastala chyba (${r.status}).` };
+        return { ok: false, answer: "Došlo k chybě při zpracování požadavku. Zkuste to prosím znovu." };
       }
 
-      // n8n někdy vrací text/stream – zkusíme JSON, jinak fallback na raw
-      try {
-        const data = JSON.parse(raw);
-        // preferujeme "text" nebo "answer" – podle toho co vrací vaše workflow
-        const ans = data.answer ?? data.text ?? data.message ?? raw;
-        return { ok: true, answer: String(ans) };
-      } catch {
-        return { ok: true, answer: raw };
-      }
+      let data = null;
+      try { data = JSON.parse(raw); } catch { data = null; }
+
+      const answer =
+        (data && (data.answer || data.text || data.output || data.message)) ||
+        raw ||
+        "Hotovo.";
+
+      return { ok: true, answer: String(answer) };
     } catch (e) {
-      return { ok: false, answer: "Nepodařilo se odeslat dotaz. Zkuste to prosím znovu." };
+      return { ok: false, answer: "Nepodařilo se odeslat dotaz. Zkontrolujte připojení a zkuste to prosím znovu." };
     }
   }
 
@@ -178,44 +190,48 @@
 
     const body = el("div", { class: "orionChatBody" });
 
-    const messages = el("div", { class: "orionChatMessages", id: "orionChatMessages" });
-    const intro = el("div", { class: "orionMsg bot" },
-      "Dobrý den, jsem Orion — webový asistent v prezentační ukázce. Napište dotaz, nebo klikněte na jednu z možností níže."
-    );
-    messages.appendChild(intro);
+    const log = el("div", { class: "orionChatLog", id: "orionChatLog" });
+    function addMsg(text, who) {
+      const m = el("div", { class: "orionMsg " + (who || "") }, text);
+      log.appendChild(m);
+      log.scrollTop = log.scrollHeight;
+    }
 
+    addMsg(
+      "Dobrý den, jsem Orion – webový asistent v prezentační ukázce. Napište dotaz, nebo zvolte jednu z možností níže.",
+      "bot"
+    );
+
+    const quickWrap = el("div", { class: "orionChatQuickWrap" });
     const quickRow = el("div", { class: "orionChatQuickRow" });
+
     const quick = [
       "Kolik to stojí?",
       "Co umí webový asistent?",
       "Jak to funguje?",
-      "Dá se to nasadit na můj web?",
+      "Je možné to nasadit na můj web?",
       "Co když se někdo ptá mimo téma?",
       "Mám zájem o nezávaznou konzultaci"
     ];
 
-    function addMsg(text, who = "bot") {
-      const msg = el("div", { class: `orionMsg ${who}` }, String(text));
-      messages.appendChild(msg);
-      messages.scrollTop = messages.scrollHeight;
-      return msg;
-    }
+    const inputRow = el("div", { class: "orionChatInputRow" });
+    const input = el("input", { class: "orionChatInput", placeholder: "Napište dotaz…", type: "text" });
+    const send = el("button", { class: "orionChatSend", type: "button", "aria-label": "Odeslat" }, "➤");
+    inputRow.appendChild(input);
+    inputRow.appendChild(send);
 
     async function handleSend(text) {
-      const t = String(text || "").trim();
+      const t = (text || "").trim();
       if (!t) return;
 
       addMsg(t, "user");
-
-      // loading
-      const loading = addMsg("…", "bot");
-
-      const resp = await sendToN8n(t);
-      loading.innerHTML = resp.answer;
-
-      // quick replies zůstávají – nic nemažeme
       input.value = "";
-      input.focus();
+
+      send.disabled = true;
+      const resp = await sendToN8n(t);
+      send.disabled = false;
+
+      addMsg(resp.answer || "Hotovo.", "bot");
     }
 
     quick.forEach((t) => {
@@ -224,19 +240,14 @@
       quickRow.appendChild(b);
     });
 
-    const inputRow = el("div", { class: "orionChatInputRow" });
-    const input = el("input", { class: "orionChatInput", placeholder: "Napište dotaz…", type: "text" });
-    const send = el("button", { class: "orionChatSend", type: "button", "aria-label": "Odeslat" }, "➤");
-    inputRow.appendChild(input);
-    inputRow.appendChild(send);
-
     send.addEventListener("click", () => handleSend(input.value));
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") handleSend(input.value);
     });
 
-    body.appendChild(messages);
-    body.appendChild(quickRow);
+    quickWrap.appendChild(quickRow);
+    body.appendChild(log);
+    body.appendChild(quickWrap);
     body.appendChild(inputRow);
     panel.appendChild(body);
 
@@ -251,7 +262,6 @@
       overlay.style.display = "block";
       panel.style.display = "block";
       input.focus();
-      messages.scrollTop = messages.scrollHeight;
     }
     function close() {
       overlay.style.display = "none";
