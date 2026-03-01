@@ -1,14 +1,21 @@
 /* assets/js/app.js
-   Shared UI (header/footer) + active nav highlighting + Ukázky demo links.
-   DŮLEŽITÉ: app.js NESMÍ upravovat chat layout. Chat řeší pouze assets/js/chat.js.
+   Shared UI (header/footer) + active nav highlighting + Ukázky page demo links.
+   Robustní: nikdy neshodí stránku.
 */
 (function () {
   "use strict";
 
   const headerMount =
-    document.getElementById("siteHeader") || document.getElementById("siteheader");
+    document.getElementById("siteHeader") ||
+    document.getElementById("siteheader") ||
+    document.getElementById("header") ||
+    document.querySelector("[data-site-header]");
+
   const footerMount =
-    document.getElementById("siteFooter") || document.getElementById("sitefooter");
+    document.getElementById("siteFooter") ||
+    document.getElementById("sitefooter") ||
+    document.getElementById("footer") ||
+    document.querySelector("[data-site-footer]");
 
   const currentFile = (location.pathname.split("/").pop() || "index.html").split("?")[0];
 
@@ -35,7 +42,7 @@
 
           <nav class="menu" aria-label="Hlavní navigace">
             <a data-nav href="./index.html">Domů</a>
-            <a data-nav href="./web-assistant.html">Vyzkoušet</a>
+            <a data-nav href="./web-assistant.html">Web Assistant</a>
             <a data-nav href="./jak-to-funguje.html">Jak to funguje</a>
             <a data-nav href="./ukazky.html">Ukázky</a>
             <a data-nav href="./kontakt.html">Kontakt</a>
@@ -48,7 +55,6 @@
       </header>
     `;
 
-    // jemný stín při scrollu
     const bar = document.getElementById("orionTopbar");
     if (bar) {
       const onScroll = () => {
