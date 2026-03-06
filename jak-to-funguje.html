@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Jak to funguje – Orion</title>
+  <title>Jak funguje Orion – AI Integrace</title>
+  <meta name="description" content="Poznejte naši architekturu. Od analýzy dotazů až po plynulé předání obchodní poptávky." />
 
   <link rel="stylesheet" href="./assets/css/styles.css" />
 
@@ -12,78 +13,74 @@
   <script src="./assets/js/chat.js" defer></script>
 </head>
 <body>
+
   <div id="siteHeader"></div>
 
-  <main class="container page">
-    <div class="pill">Jak to funguje</div>
-    <h1>Jak Orion funguje</h1>
-
-    <p class="muted">
-      Orion není „obecný chatbot“. Je to web/e-shop asistent s hranicemi. Cíl: odpovědět rychle, srozumitelně
-      a když je to poptávka, dovést uživatele k akci (kontakt / konzultace).
-    </p>
-
-    <section class="grid3" style="margin-top:14px">
-      <div class="card">
-        <h2>1) Vstup</h2>
-        <p class="muted">
-          Uživatel napíše dotaz nebo klikne na quick replies. Orion si přečte kontext a drží se scénáře.
-        </p>
-      </div>
-      <div class="card">
-        <h2>2) Odpověď</h2>
-        <p class="muted">
-          Stručně odpoví + navrhne další krok. Když něco chybí, položí jednu doplňující otázku místo omáčky.
-        </p>
-      </div>
-      <div class="card">
-        <h2>3) Handoff</h2>
-        <p class="muted">
-          Když jde o konzultaci / nasazení, přesměruje na kontakt nebo předá poptávku (n8n/webhook).
-        </p>
-      </div>
-    </section>
-
-    <section class="card" style="margin-top:16px">
-      <h2>Hranice tématu</h2>
+  <main class="container page premium-layout">
+    <div class="text-center max-w-700 mx-auto mb-20">
+      <div class="pill highlight">Technologické workflow</div>
+      <h1>Architektura, která <span class="blue-gradient-text">přináší výsledky</span></h1>
       <p class="muted">
-        V ukázce je Orion omezen na web/e-shop témata. Mimo téma odpoví slušně a vrací konverzaci do správné oblasti,
-        aby odpovědi byly konzistentní a „neustřelily“.
+        Orion je sofistikovaný systém s pevně stanovenými hranicemi. Naším cílem není nahradit lidský kontakt, ale filtrovat informační šum a doručit Vám pouze relevantní a kvalifikované obchodní příležitosti.
       </p>
-      <ul class="muted" style="margin-top:8px">
-        <li>web/e-shop dotazy: ano</li>
-        <li>cizí témata (ubytování, politika, zdraví apod.): odmítne + vrátí zpět</li>
-        <li>poptávka: kvalifikuje + nasměruje na kontakt</li>
-      </ul>
-    </section>
+    </div>
 
-    <section class="grid2" style="margin-top:16px">
-      <div class="card">
-        <h2>Napojení (demo)</h2>
+    <section class="grid3 mt-20">
+      <div class="card glass-effect relative">
+        <div class="icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+        </div>
+        <h3>1. Analýza a Routing</h3>
         <p class="muted">
-          Demo ukazuje princip: chat a formulář se napojují přes webhook. Ve skutečném nasazení se to připojí
-          na CRM, e-mail, helpdesk nebo objednávkový systém.
+          Jakmile návštěvník položí dotaz, náš LLM router okamžitě analyzuje jeho záměr (intent). Rozpozná, zda jde o běžný dotaz na FAQ, nebo o byznysovou poptávku vyžadující zvláštní péči.
         </p>
       </div>
-      <div class="card">
-        <h2>Co z toho má firma</h2>
+      
+      <div class="card glass-effect">
+        <div class="icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        </div>
+        <h3>2. Inteligentní odpověď</h3>
         <p class="muted">
-          Rychlejší odpovědi, méně opakovaných dotazů pro tým, vyšší šance, že návštěvník skončí kontaktem/poptávkou.
+          Asistent čerpá výhradně z Vaší schválené znalostní báze (Knowledge Base). Odpovídá stručně, věcně a vždy udržuje profesionální tón Vaší značky. Nehalucinuje.
+        </p>
+      </div>
+      
+      <div class="card glass-effect">
+        <div class="icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
+        </div>
+        <h3>3. Handoff a Konverze</h3>
+        <p class="muted">
+          Pokud návštěvník projeví zájem o služby, asistent od něj diskrétně získá kontaktní údaje a předá strukturovaný lead přes webhook přímo do Vašeho CRM nebo na e-mail.
         </p>
       </div>
     </section>
 
-    <section class="card" style="margin-top:16px">
-      <h2>Chceš to nasadit?</h2>
-      <p class="muted">
-        Cenu neuvádím dopředu — domluvíme se podle rozsahu při krátké konzultaci. Nejdřív zjistíme potřeby a cíle.
-      </p>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
-        <a class="btn btn-primary" href="./kontakt.html">Nezávazná konzultace</a>
-        <a class="btn" href="./web-assistant.html">Zpět na demo stránku</a>
+    <section class="audience-section section-spacing mt-20">
+      <div class="grid2 items-center">
+        <div class="card glass-effect">
+          <h3 class="blue-gradient-text">Garantované hranice tématu</h3>
+          <p class="muted mt-10">
+            Náš systém využívá pokročilý prompt engineering, který asistenta pevně ukotvuje v oboru Vašeho podnikání.
+          </p>
+          <ul class="check-list muted mt-10">
+            <li><strong>Podpora byznysu:</strong> Fokus na prodej, služby a podporu.</li>
+            <li><strong>Ochrana značky:</strong> Odmítá diskuze o politice, konkurenci či nesouvisejících tématech.</li>
+            <li><strong>Jemná korekce:</strong> Zákazníka vždy slušně navrátí k Vašim produktům.</li>
+          </ul>
+        </div>
+        <div>
+          <h2>Bezproblémová integrace přes n8n</h2>
+          <p class="muted">
+            Celé řešení stavíme na robustní platformě n8n. To nám umožňuje propojit asistenta s jakýmkoliv systémem, který již ve firmě používáte (Slack, Gmail, HubSpot, Raynet a další).
+          </p>
+          <div class="mt-20">
+            <a class="btn btn-primary" href="./kontakt.html">Poptat integraci</a>
+          </div>
+        </div>
       </div>
     </section>
-
   </main>
 
   <div id="siteFooter"></div>
