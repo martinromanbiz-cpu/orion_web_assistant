@@ -13,6 +13,10 @@
   <script src="./assets/js/chat.js" defer></script>
 </head>
 <body>
+  <div class="bg-abstract">
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+  </div>
 
   <div id="siteHeader"></div>
 
@@ -41,7 +45,7 @@
         </div>
       </div>
 
-    <div class="hero-visual">
+      <div class="hero-visual">
         <div class="glass-panel text-center">
             <h3 class="blue-gradient-text" style="margin-bottom: 5px;">ORION Workflow</h3>
             <p class="muted text-sm">Inteligentní zpracování v reálném čase</p>
@@ -50,15 +54,11 @@
                 <div class="node" title="Návštěvník webu">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                 </div>
-                
                 <div class="connection"></div>
-                
                 <div class="node active" title="Orion AI (LLM Router)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10H12V2zM21.18 8.02c-1-2.34-2.72-4.22-4.9-5.32V12h7.02c-.1-1.38-.68-2.7-1.42-3.98z"></path></svg>
                 </div>
-                
                 <div class="connection conn-2"></div>
-                
                 <div class="node" title="Váš systém / n8n / CRM">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
                 </div>
@@ -76,7 +76,7 @@
       <div class="section-header text-center mx-auto max-w-700">
         <h2>Komunikace na úrovni Vaší značky</h2>
         <p class="muted">
-          Náš asistent není jen "hloupý chatbot". Orion využívá pokročilou klasifikaci dotazů, aby zajistil plynulou konverzaci a přesně ví, kdy má předat konverzaci živému obchodníkovi.
+          Náš asistent není jen "hloupý chatbot". Orion využívá pokročilou klasifikaci dotazů, aby zajistil plynulou konverzaci a přesně ví, kdy má předat složitější požadavek živému obchodníkovi.
         </p>
       </div>
 
@@ -86,54 +86,80 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
           </div>
           <h3>Expertní zákaznická péče</h3>
-          <p class="muted">
-            Okamžitě řeší logistiku, platby, dostupnost či reklamační řády. Vašemu týmu tak zbyde čas na řešení složitějších případů.
-          </p>
+          <p class="muted">Okamžitě řeší logistiku, platby či reklamační řády. Vašemu týmu tak zbyde čas na řešení složitějších případů a VIP klientů.</p>
         </div>
-
         <div class="card">
           <div class="icon-wrapper">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg>
           </div>
           <h3>Kvalifikace B2B poptávek</h3>
-          <p class="muted">
-            Identifikuje obchodní příležitosti. Zjistí parametry (rozpočet, cíle) a strukturovaný lead zašle přímo do Vašeho CRM nebo e-mailu.
-          </p>
+          <p class="muted">Identifikuje obchodní příležitosti. Zjistí parametry a strukturovaný lead zašle přes n8n webhook přímo do Vašeho CRM.</p>
         </div>
-
         <div class="card">
           <div class="icon-wrapper">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
           </div>
           <h3>Striktní dodržování tématu</h3>
-          <p class="muted">
-            Orion je oborový. Pokud se konverzace stočí na nesouvisející témata, asistent asertivně a slušně vrátí klienta zpět k Vašim službám.
+          <p class="muted">Orion je oborový. Pokud se konverzace stočí na nesouvisející témata, asistent asertivně a slušně vrátí klienta zpět k Vašim službám.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="author-section section-spacing">
+      <div class="card glass-effect author-box">
+        <div class="author-avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+        <div class="author-content">
+          <span class="author-role">Architekt řešení & Integrátor</span>
+          <h3 class="blue-gradient-text">Martin – Váš partner pro digitální růst</h3>
+          <p class="muted mt-10">
+            "Věřím, že umělá inteligence by neměla nahrazovat lidský kontakt, ale naopak ho chránit. Během vývoje AI asistentů se nesoustředím jen na to, aby systém fungoval technologicky (přes robustní platformu n8n), ale především na to, aby <strong>dával obchodní smysl</strong>. Mým cílem je navrhovat rozhraní, která šetří Váš čas, eliminují informační šum a doručují Vám na stůl pouze relevantní a vysoce kvalifikované poptávky."
           </p>
         </div>
       </div>
     </section>
 
-    <section class="audience-section section-spacing">
-      <div class="grid2 items-center">
-        <div>
-          <h2>Prémiová řešení nestavíme jako šablonu</h2>
-          <p class="muted">
-            Každá integrace je unikátní projekt. Počínaje analýzou Vaší znalostní báze přes nastavení komunikačního tónu až po finální napojení na platformu n8n.
-          </p>
-          <ul class="check-list muted">
-            <li><strong>E-shopy:</strong> Rychlá orientace a zvýšení konverzí.</li>
-            <li><strong>B2B a IT firmy:</strong> Kvalifikace leadů a profesionální první dojem.</li>
-            <li><strong>Služby:</strong> Automatizace FAQ a směrování do rezervačních formulářů.</li>
-          </ul>
+    <section class="faq-section section-spacing">
+      <div class="text-center max-w-700 mx-auto mb-20">
+        <h2>Nejčastější <span class="blue-gradient-text">dotazy</span></h2>
+        <p class="muted">Transparentnost je základem naší spolupráce. Níže naleznete odpovědi na otázky, které řešíme s klienty nejčastěji.</p>
+      </div>
+
+      <div class="max-w-700 mx-auto">
+        <div class="faq-item">
+          <button class="faq-question">
+            Lze asistenta napojit na náš stávající web?
+            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer">
+            <p>Ano, absolutně. Integrace je navržena tak, aby byla maximálně nenáročná. Na Váš web (ať už běží na WordPressu, Shoptetu nebo na vlastním kódu) se vloží pouze jeden krátký kus kódu. Veškerá složitá logika a databáze běží bezpečně u nás na serverech n8n.</p>
+          </div>
         </div>
-        <div class="visual-stack card glass-effect text-center">
-            <h3 class="blue-gradient-text">Technologický stack</h3>
-            <p class="muted text-sm">LLM Routing, Vector DB, n8n Automation</p>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            Jak dlouho trvá nasazení systému?
+            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer">
+            <p>Standardní nasazení včetně analýzy Vaší "Knowledge Base" (znalostní databáze) a nastavení komunikačního tónu zabere zhruba 7 až 14 dní. Nejvíce času věnujeme pečlivému testování, aby asistent přesně odpovídal identitě Vaší značky.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            Bude AI vymýšlet věci (halucinovat)?
+            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer">
+            <p>Ne. Náš systém využívá striktní ohraničení (tzv. Vector DB routing). Asistent dostane striktní instrukce odpovídat výhradně na základě dat, která nám poskytnete. Pokud odpověď nezná, nezkouší hádat, ale profesionálně vyžádá e-mailový kontakt pro živou podporu.</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="cta-section section-spacing mt-20 text-center">
+    <section class="cta-section section-spacing text-center">
       <div class="card cta-card highlight-border">
         <h2>Připraveni optimalizovat Vaši zákaznickou zkušenost?</h2>
         <p class="muted max-w-700 mx-auto mt-10 mb-20">
@@ -148,5 +174,21 @@
   </main>
 
   <div id="siteFooter"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const faqItems = document.querySelectorAll('.faq-item');
+      faqItems.forEach(item => {
+        const btn = item.querySelector('.faq-question');
+        btn.addEventListener('click', () => {
+          const isActive = item.classList.contains('active');
+          // Zavřít všechny ostatní
+          faqItems.forEach(i => i.classList.remove('active'));
+          // Otevřít aktuální, pokud nebyl otevřený
+          if (!isActive) item.classList.add('active');
+        });
+      });
+    });
+  </script>
 </body>
 </html>
