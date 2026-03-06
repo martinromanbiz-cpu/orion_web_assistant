@@ -3,53 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Ukázky – Orion</title>
-  <meta name="description" content="Externí demo ukázky Orion AI Web Assistant." />
+  <title>Referenční Ukázky – Orion AI</title>
+  <meta name="description" content="Prohlédněte si různé varianty nasazení AI asistenta Orion v praxi." />
+
   <link rel="stylesheet" href="./assets/css/styles.css" />
+
   <script src="./assets/js/config.js" defer></script>
   <script src="./assets/js/app.js" defer></script>
   <script src="./assets/js/chat.js" defer></script>
 </head>
 <body>
+
   <div id="siteHeader"></div>
 
-  <main class="container page">
-    <div class="pill">Odkazy + krátký popis</div>
-    <h1>Ukázky</h1>
-    <p class="muted">
-      Kliknutím se otevře nová karta. Každá ukázka demonstruje jiný styl použití (e-shop / test).
-    </p>
-
-    <section class="card" style="margin-top:16px">
-      <h2 style="margin-bottom:10px">Externí demo odkazy</h2>
-      <div id="demoLinks" class="demoLinks"></div>
-      <p class="muted" style="margin-top:10px">
-        Odkazy se berou z <code>assets/js/config.js</code> (pole <code>ORION_CONFIG.DEMO_LINKS</code>).
+  <main class="container page premium-layout">
+    <div class="text-center max-w-700 mx-auto mb-20">
+      <div class="pill highlight">Nasazení v praxi</div>
+      <h1>Referenční <span class="blue-gradient-text">Projekty</span></h1>
+      <p class="muted">
+        Každý segment trhu vyžaduje specifický přístup. Níže naleznete oddělená sandbox prostředí, 
+        která demonstrují, jak Orion přizpůsobuje svůj tón a znalosti konkrétnímu odvětví (od e-commerce až po B2B služby).
       </p>
+    </div>
+
+    <section class="mt-20">
+      <div id="demoLinks" class="grid2"></div>
     </section>
 
-    <section class="card" style="margin-top:16px">
-      <h2>Co si má návštěvník ze stránky odnést</h2>
-      <ul class="list">
-        <li>asistent odpovídá konzistentně a stručně</li>
-        <li>drží hranice tématu (web/e-shop)</li>
-        <li>vede návštěvníka k dalšímu kroku (kontakt / konzultace)</li>
-        <li>u obchodních dotazů umí předat poptávku (handoff)</li>
-      </ul>
-    </section>
-
-    <section class="card" style="margin-top:16px">
-      <h2>Co lze upravit na míru</h2>
-      <ul class="list">
-        <li>texty, tón komunikace, brand</li>
-        <li>rychlé volby (klikací dotazy)</li>
-        <li>hranice témat a pravidla odpovědí</li>
-        <li>napojení na interní systémy (CRM, e-mail, helpdesk)</li>
-      </ul>
-      <div style="margin-top:14px">
-        <a class="btn primary" href="./kontakt.html">Nezávazná konzultace</a>
+    <section class="card glass-effect mt-20 section-spacing text-center">
+      <h2>Nenašli jste ukázku z Vašeho oboru?</h2>
+      <p class="muted max-w-700 mx-auto mt-10 mb-20">
+        Asistenta lze kompletně customizovat – od barvy tlačítek až po slovní zásobu a tone of voice. 
+        Rádi Vám během konzultace ukážeme, jak by Orion fungoval přímo s Vašimi daty.
+      </p>
+      <div class="action-buttons">
+        <a class="btn btn-primary btn-large" href="./kontakt.html">Sjednat konzultaci na míru</a>
       </div>
     </section>
+
   </main>
 
   <div id="siteFooter"></div>
