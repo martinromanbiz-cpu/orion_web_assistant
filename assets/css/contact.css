@@ -1,154 +1,156 @@
-:root{
-  --bg: #f6f8fc;
-  --card: #ffffff;
-  --text: #0f172a;
-  --muted: #475569;
-  --line: rgba(15, 23, 42, .10);
-  --blue: #2563eb;
-  --blue2:#1d4ed8;
-  --shadow: 0 12px 40px rgba(2, 6, 23, .10);
-  --radius: 18px;
+/* ==========================================================================
+   assets/css/contact.css
+   Specifické styly pro prémiový kontaktní formulář
+   ========================================================================== */
+
+.contact-layout {
+    align-items: flex-start;
 }
 
-.contact-wrap{
-  background: radial-gradient(1200px 600px at 20% 0%, rgba(37,99,235,.14), transparent 55%),
-              radial-gradient(900px 500px at 80% 20%, rgba(29,78,216,.10), transparent 55%),
-              var(--bg);
-  padding: 56px 16px;
-  min-height: calc(100vh - 120px);
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
+.form-card {
+    padding: 40px;
 }
 
-.contact-card{
-  width:min(860px, 100%);
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow:hidden;
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
-.contact-head{
-  padding: 26px 26px 18px;
-  border-bottom: 1px solid var(--line);
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
-.badge{
-  display:inline-block;
-  font-size: 12px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(37,99,235,.10);
-  color: var(--blue2);
-  border: 1px solid rgba(37,99,235,.18);
-  margin-bottom: 10px;
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
 }
 
-.contact-head h1{
-  margin: 0;
-  font-size: 28px;
-  color: var(--text);
-  letter-spacing: -0.02em;
+.input-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
-.contact-head p{
-  margin: 8px 0 0;
-  color: var(--muted);
-  line-height: 1.5;
+.input-group .req {
+    color: var(--accent-cyan);
 }
 
-.contact-form{
-  padding: 22px 26px 26px;
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    font-size: 0.95rem;
+    outline: none;
+    transition: var(--transition);
 }
 
-.grid{
-  display:grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
+.contact-form textarea {
+    resize: vertical;
+    min-height: 120px;
 }
 
-label span{
-  display:block;
-  font-size: 12px;
-  color: var(--muted);
-  margin: 0 0 6px;
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+    color: #4b5563; /* Tmavší šedá pro placeholder */
 }
 
-input, textarea{
-  width: 100%;
-  padding: 12px 12px;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  background: #fff;
-  color: var(--text);
-  outline: none;
-  transition: border-color .15s ease, box-shadow .15s ease;
+/* Hover a Focus efekty pro prémiový feel */
+.contact-form input:hover,
+.contact-form textarea:hover {
+    border-color: rgba(34, 211, 238, 0.3);
 }
 
-input:focus, textarea:focus{
-  border-color: rgba(37,99,235,.55);
-  box-shadow: 0 0 0 4px rgba(37,99,235,.12);
+.contact-form input:focus,
+.contact-form textarea:focus {
+    border-color: var(--accent-cyan);
+    background: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15);
 }
 
-.full{ margin-top: 14px; display:block; }
-
-.actions{
-  margin-top: 14px;
-  display:flex;
-  gap: 12px;
-  align-items:center;
+.form-submit-btn {
+    width: 100%;
+    margin-top: 10px;
 }
 
-.btn-primary{
-  appearance:none;
-  border: 0;
-  border-radius: 12px;
-  padding: 12px 16px;
-  background: linear-gradient(180deg, var(--blue), var(--blue2));
-  color: #fff;
-  font-weight: 600;
-  cursor:pointer;
+.status-msg {
+    font-size: 0.9rem;
+    color: var(--accent-cyan);
+    font-weight: 500;
+    text-align: center;
 }
 
-.btn-primary:disabled{
-  opacity: .65;
-  cursor:not-allowed;
+/* Očíslovaný seznam v pravém panelu */
+.custom-counter {
+    list-style: none;
+    padding: 0;
+    counter-reset: step-counter;
 }
 
-.btn-secondary{
-  appearance:none;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 10px 14px;
-  background: #fff;
-  color: var(--text);
-  font-weight: 600;
-  cursor:pointer;
+.custom-counter li {
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 16px;
+    line-height: 1.5;
 }
 
-.status{
-  font-size: 13px;
-  color: var(--muted);
+.custom-counter li::before {
+    counter-increment: step-counter;
+    content: counter(step-counter);
+    position: absolute;
+    left: 0;
+    top: -2px;
+    width: 26px;
+    height: 26px;
+    background: rgba(34, 211, 238, 0.1);
+    border: 1px solid rgba(34, 211, 238, 0.4);
+    color: var(--accent-cyan);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
 }
 
-.success{
-  padding: 22px 26px 26px;
+.custom-counter li strong {
+    color: var(--text-primary);
 }
 
-.success h3{
-  margin:0 0 6px;
-  font-size: 18px;
-  color: var(--text);
+/* Úspěšná hláška (injektovaná přes JS) */
+.success-msg {
+    text-align: center;
+    padding: 40px 20px;
+    animation: fadeIn 0.5s ease-out;
 }
 
-.success p{
-  margin:0 0 14px;
-  color: var(--muted);
-  line-height:1.5;
+.success-msg h3 {
+    color: var(--accent-cyan);
+    font-size: 1.8rem;
+    margin-bottom: 10px;
 }
 
-@media (max-width: 860px){
-  .grid{ grid-template-columns: 1fr; }
+.success-msg p {
+    color: var(--text-muted);
+}
+
+/* Responzivita pro mobily */
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    .form-card {
+        padding: 24px;
+    }
 }
