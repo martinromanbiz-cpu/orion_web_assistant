@@ -1,140 +1,101 @@
-/* assets/js/app.js
-   Shared UI (header/footer) + active nav highlighting + Ukázky page demo links.
-   Robustní: nikdy neshodí stránku.
-*/
-(function () {
-  "use strict";
-
-  const headerMount =
-    document.getElementById("siteHeader") ||
-    document.getElementById("siteheader") ||
-    document.getElementById("header") ||
-    document.querySelector("[data-site-header]");
-
-  const footerMount =
-    document.getElementById("siteFooter") ||
-    document.getElementById("sitefooter") ||
-    document.getElementById("footer") ||
-    document.querySelector("[data-site-footer]");
-
-  const currentFile = (location.pathname.split("/").pop() || "index.html").split("?")[0];
-
-  function safeHTML(str) {
-    return String(str ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-
-  function injectHeader() {
-    if (!headerMount) return;
-
-    headerMount.innerHTML = `
-      <header class="topbar" id="orionTopbar">
-        <div class="container nav">
-          <a class="brand" href="./index.html" aria-label="Orion (domů)">
-            <img src="./assets/img/orion-mark.svg" alt="Orion" width="36" height="36" />
-            <span class="brandText">Orion Web Assistant</span>
-            <span class="badge">DEMO</span>
-          </a>
-
-          <nav class="menu" aria-label="Hlavní navigace">
-            <a data-nav href="./index.html">Domů</a>
-            <a data-nav href="./web-assistant.html">Web Assistant</a>
-            <a data-nav href="./jak-to-funguje.html">Jak to funguje</a>
-            <a data-nav href="./ukazky.html">Ukázky</a>
-            <a data-nav href="./kontakt.html">Kontakt</a>
-          </nav>
-
-          <div class="cta">
-            <a class="btn primary" href="./kontakt.html">Nezávazná konzultace</a>
-          </div>
-        </div>
-      </header>
-    `;
-
-    const bar = document.getElementById("orionTopbar");
-    if (bar) {
-      const onScroll = () => {
-        if (window.scrollY > 6) bar.classList.add("scrolled");
-        else bar.classList.remove("scrolled");
-      };
-      onScroll();
-      window.addEventListener("scroll", onScroll, { passive: true });
-    }
-  }
-
-  function injectFooter() {
-    if (!footerMount) return;
-
-    footerMount.innerHTML = `
-      <footer class="footer">
-        <div class="container">
-          <div class="footerInner">
-            <div>© <span id="y"></span> Martin Roman • Orion</div>
-            <div>Prezentační ukázka AI asistenta pro weby a e-shopy</div>
-          </div>
-        </div>
-      </footer>
-    `;
-
-    const y = document.getElementById("y");
-    if (y) y.textContent = String(new Date().getFullYear());
-  }
-
-  function setActiveNav() {
-    document.querySelectorAll("[data-nav]").forEach((a) => {
-      const href = (a.getAttribute("href") || "").split("?")[0];
-      const file = href.split("/").pop();
-      if (file === currentFile) a.classList.add("active");
-      else a.classList.remove("active");
-    });
-  }
-
-  // Ukázky: render odkazy z ORION_CONFIG.DEMO_LINKS do #demoLinks
-  function renderDemoLinksIfPresent() {
-    const mount = document.getElementById("demoLinks");
-    if (!mount) return;
-
-    const cfg = window.ORION_CONFIG || {};
-    const links = Array.isArray(cfg.DEMO_LINKS) ? cfg.DEMO_LINKS : [];
-
-    if (!links.length) {
-      mount.innerHTML =
-        `<p class="muted">Externí demo odkazy nejsou nastavené v <code>assets/js/config.js</code> (pole <code>ORION_CONFIG.DEMO_LINKS</code>).</p>`;
-      return;
+// app.js - Hlavní logika webu a renderování komponent
+document.addEventListener('DOMContentLoaded', () => {
+    renderLayout();
+    
+    // Pokud jsme na stránce ukazky.html, vykreslíme dema
+    if (document.getElementById('demoLinks')) {
+        renderDemoLinks();
     }
 
-    mount.innerHTML = links
-      .map((l) => {
-        const title = safeHTML(l.title || "Ukázka");
-        const url = safeHTML(l.url || "#");
-        return `
-          <div class="demoLinkCard">
-            <div class="demoLinkTitle">${title}</div>
-            <a class="btn" href="${url}" target="_blank" rel="noopener">Otevřít ukázku</a>
-          </div>
+    // Inicializace kontaktniho formuláře, pokud existuje
+    const contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+        initContactForm(contactForm);
+    }
+});
+
+function renderLayout() {
+    const header = document.getElementById('siteHeader');
+    const footer = document.getElementById('siteFooter');
+
+    if (header) {
+        header.innerHTML = `
+            <header class="main-header">
+                <div class="container">
+                    <div class="logo-area">
+                        <img src="./assets/img/orion-mark.svg" alt="Orion" class="logo-img" onerror="this.style.display='none'">
+                        <span class="logo-text">ORION <small>Assistant</small></span>
+                    </div>
+                    <nav class="main-nav">
+                        <ul>
+                            <li><a href="index.html">Domů</a></li>
+                            <li><a href="web-assistant.html">Web Assistant</a></li>
+                            <li><a href="jak-to-funguje.html">Jak to funguje</a></li>
+                            <li><a href="ukazky.html">Ukázky</a></li>
+                            <li><a href="kontakt.html" class="btn-cta">Kontakt</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </header>
         `;
-      })
-      .join("");
-  }
-
-  function boot() {
-    try {
-      injectHeader();
-      injectFooter();
-      setActiveNav();
-      renderDemoLinksIfPresent();
-    } catch (e) {
-      console.error("Orion app.js failed safely:", e);
     }
-  }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot);
-  } else {
-    boot();
-  }
-})();
+    if (footer) {
+        footer.innerHTML = `
+            <footer class="main-footer">
+                <div class="container">
+                    <p>&copy; 2026 Orion AI. Všechna práva vyhrazena. | Profesionální automatizace pro Váš business.</p>
+                </div>
+            </footer>
+        `;
+    }
+}
+
+function renderDemoLinks() {
+    const container = document.getElementById('demoLinks');
+    if (!container) return;
+
+    container.innerHTML = CONFIG.DEMO_LINKS.map(demo => `
+        <div class="demo-card">
+            <h3>${demo.title}</h3>
+            <p>${demo.desc}</p>
+            <a href="${demo.url}" target="_blank" class="btn-secondary">Prohlédnout demo</a>
+        </div>
+    `).join('');
+}
+
+async function initContactForm(form) {
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = form.querySelector('button');
+        const originalText = btn.innerText;
+        
+        const formData = {
+            name: form.name.value,
+            email: form.email.value,
+            phone: form.phone.value,
+            message: form.message.value
+        };
+
+        try {
+            btn.innerText = "Odesílám...";
+            btn.disabled = true;
+
+            const response = await fetch(CONFIG.CONTACT_WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok) {
+                form.innerHTML = `<div class="success-msg"><h3>Děkujeme!</h3><p>Vaše zpráva byla úspěšně odeslána. Budeme Vás kontaktovat co nejdříve.</p></div>`;
+            } else {
+                throw new Error();
+            }
+        } catch (error) {
+            alert("Omlouváme se, došlo k chybě. Prosím, zkuste to znovu nebo nám napište přímo.");
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    });
+}
