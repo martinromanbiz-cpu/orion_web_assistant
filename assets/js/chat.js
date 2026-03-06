@@ -29,7 +29,7 @@
 
     // Luxusní temné CSS pro chat widget
     const css = `
-      .orionChatFab {
+      .orionChatFab {animation: fabPulse 2.5s infinite;
         position: fixed; right: 24px; bottom: 24px; z-index: 99999;
         width: 60px; height: 60px; border-radius: 20px;
         background: linear-gradient(135deg, #22d3ee, #0284c7);
@@ -38,6 +38,11 @@
         display: flex; align-items: center; justify-content: center;
         cursor: pointer; user-select: none; transition: all 0.3s ease;
       }
+      @keyframes fabPulse {
+    0% { box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.5); }
+    70% { box-shadow: 0 0 0 15px rgba(34, 211, 238, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(34, 211, 238, 0); }
+}
       .orionChatFab:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(34, 211, 238, 0.6); }
       .orionChatFabIcon { width: 32px; height: 32px; }
 
