@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Referenční Ukázky – Orion AI</title>
-  <meta name="description" content="Prohlédněte si různé varianty nasazení AI asistenta Orion v praxi." />
+  <title>Případové studie a Ukázky – Orion AI</title>
+  <meta name="description" content="Prohlédněte si, jak AI automatizace mění pravidla hry v zákaznické podpoře." />
 
   <link rel="stylesheet" href="./assets/css/styles.css" />
 
@@ -13,32 +13,63 @@
   <script src="./assets/js/chat.js" defer></script>
 </head>
 <body>
-
   <div id="siteHeader"></div>
 
   <main class="container page premium-layout">
     <div class="text-center max-w-700 mx-auto mb-20">
-      <div class="pill highlight">Nasazení v praxi</div>
-      <h1>Referenční <span class="blue-gradient-text">Projekty</span></h1>
+      <div class="pill highlight">Analýza dopadů</div>
+      <h1>Od teorie k <span class="blue-gradient-text">výsledkům</span></h1>
       <p class="muted">
-        Každý segment trhu vyžaduje specifický přístup. Níže naleznete oddělená sandbox prostředí, 
-        která demonstrují, jak Orion přizpůsobuje svůj tón a znalosti konkrétnímu odvětví (od e-commerce až po B2B služby).
+        Níže naleznete detailní rozbor toho, jak naše architektura řeší reálné problémy firem. Nezajímáme se jen o to, "jak to vypadá", ale především o to, "jakou hodnotu to přináší".
       </p>
     </div>
 
-    <section class="mt-20">
-      <div id="demoLinks" class="grid2"></div>
+    <section class="card glass-effect mt-20 p-40">
+      <div class="pill">Featured Case Study</div>
+      <h2 style="margin-bottom: 20px;">Automatizace e-shopu: Snížení podpory o 40 %</h2>
+      
+      <div class="grid2">
+        <div>
+          <h3 class="blue-gradient-text" style="font-size: 1.2rem;">Situace a Úkol (Situation & Task)</h3>
+          <p class="muted mb-20">
+            Úspěšný e-shop čelil v hlavní sezóně kolapsu zákaznické podpory. Až 60 % ticketů tvořily repetitivní dotazy na stav objednávky a reklamační řád. Reakční doba stoupla na 14 hodin, což frustrovalo zákazníky a vyčerpávalo tým. Cílem bylo nasadit AI bez ztráty "lidské tváře" značky.
+          </p>
+          
+          <h3 class="blue-gradient-text" style="font-size: 1.2rem;">Strategická Akce (Action)</h3>
+          <p class="muted mb-20">
+            Nenasadili jsme běžného bota. Postavili jsme ekosystém přes <strong>n8n</strong>. Asistenta jsme napojili na striktní "Vector DB" databázi obsahující přesná pravidla dopravy. Vytvořili jsme speciální LLM router: Pokud dotaz obsahoval stížnost nebo složitý technický problém, asistent odpověď negeneroval, ale s omluvou rovnou vyžádal e-mail pro živého operátora.
+          </p>
+        </div>
+        
+        <div>
+          <h3 class="blue-gradient-text" style="font-size: 1.2rem;">Měřitelný Výsledek (Result)</h3>
+          <ul class="check-list muted mb-20">
+            <li><strong>- 40 % L1 ticketů:</strong> Asistent okamžitě odbavil tisíce rutinních dotazů.</li>
+            <li><strong>0 halucinací:</strong> Díky tvrdým hranicím nedošlo k žádné dezinformaci.</li>
+            <li><strong>&lt; 5 sekund:</strong> Průměrná doba do vyřešení běžného problému klienta.</li>
+          </ul>
+
+          <div class="card" style="background: rgba(34, 211, 238, 0.05); border-color: rgba(34, 211, 238, 0.2);">
+            <h3 style="font-size: 1.1rem;">Ponaučení pro budoucnost (Takeaway)</h3>
+            <p class="muted text-sm" style="margin:0;">
+              Nasazení AI není o nahrazení lidí. Je to o jejich osvobození od robotické práce, aby se mohli věnovat budování vztahů a řešení komplexních případů, které algoritmy (zatím) nezvládnou.
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section class="card glass-effect mt-20 section-spacing text-center">
-      <h2>Nenašli jste ukázku z Vašeho oboru?</h2>
-      <p class="muted max-w-700 mx-auto mt-10 mb-20">
-        Asistenta lze kompletně customizovat – od barvy tlačítek až po slovní zásobu a tone of voice. 
-        Rádi Vám během konzultace ukážeme, jak by Orion fungoval přímo s Vašimi daty.
+    <section class="mt-20 section-spacing text-center">
+      <h2>Interaktivní Sandbox <span class="blue-gradient-text">(Playground)</span></h2>
+      <p class="muted max-w-700 mx-auto mb-20">
+        Prozkoumejte naše oddělená testovací prostředí. Ukazují základní schopnosti asistenta v různých oborových scénářích (od e-commerce až po B2B služby).
       </p>
-      <div class="action-buttons">
-        <a class="btn btn-primary btn-large" href="./kontakt.html">Sjednat konzultaci na míru</a>
-      </div>
+      
+      <div id="demoLinks" class="grid2 text-left"></div>
+    </section>
+
+    <section class="cta-section mt-20 text-center">
+        <a class="btn btn-primary btn-large" href="./kontakt.html">Sjednat nezávaznou konzultaci</a>
     </section>
 
   </main>
