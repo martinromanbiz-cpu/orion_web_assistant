@@ -434,3 +434,84 @@ h3 { font-size: 1.5rem; }
 .feature-cards .card:hover::before {
     opacity: 1;
 }
+/* ==========================================================================
+   14. Sekce: FAQ (Akordion) a Human Touch (O autorovi)
+   ========================================================================== */
+
+/* FAQ Akordion */
+.faq-section { margin-top: 40px; }
+.faq-item {
+    background: rgba(17, 24, 39, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    transition: var(--transition);
+}
+.faq-item:hover { border-color: rgba(34, 211, 238, 0.3); }
+
+.faq-question {
+    width: 100%;
+    text-align: left;
+    padding: 20px 25px;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-main);
+}
+
+.faq-icon {
+    width: 24px; height: 24px;
+    color: var(--accent-cyan);
+    transition: transform 0.3s ease;
+}
+.faq-item.active .faq-icon { transform: rotate(180deg); }
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.4s ease;
+    padding: 0 25px;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+.faq-item.active .faq-answer {
+    max-height: 200px; /* Dostatečný prostor pro text */
+    padding: 0 25px 25px 25px;
+}
+
+/* Human Touch (O autorovi) */
+.author-box {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 40px;
+}
+.author-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--bg-dark), rgba(34, 211, 238, 0.2));
+    border: 2px solid var(--accent-cyan);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 10px 30px rgba(34, 211, 238, 0.2);
+    overflow: hidden;
+}
+.author-avatar svg { width: 50px; height: 50px; color: var(--accent-cyan); }
+.author-content h3 { font-size: 1.6rem; margin-bottom: 5px; }
+.author-role { font-size: 0.9rem; color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; display: block; margin-bottom: 15px; }
+
+@media (max-width: 768px) {
+    .author-box { flex-direction: column; text-align: center; }
+}
