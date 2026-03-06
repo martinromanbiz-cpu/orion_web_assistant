@@ -258,7 +258,131 @@ h3 { font-size: 1.5rem; }
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+/* ==========================================================================
+   12. Abstraktní grafika a Animace (Nové)
+   ========================================================================== */
 
+/* Ambientní Orby na pozadí */
+.bg-abstract {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none; /* Kliknutí projde skrz pozadí */
+}
+
+.bg-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px); /* Extrémní rozostření vytvoří "mlhu" */
+    opacity: 0.35;
+    animation: floatOrb 25s infinite alternate ease-in-out;
+}
+
+.orb-1 {
+    width: 50vw;
+    height: 50vw;
+    background: var(--accent-purple);
+    top: -10%;
+    left: -10%;
+    animation-delay: 0s;
+}
+
+.orb-2 {
+    width: 40vw;
+    height: 40vw;
+    background: var(--accent-cyan);
+    bottom: -10%;
+    right: -10%;
+    animation-delay: -5s;
+}
+
+@keyframes floatOrb {
+    0% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(5%, -5%) scale(1.1); }
+    66% { transform: translate(-3%, 4%) scale(0.9); }
+    100% { transform: translate(0, 0) scale(1); }
+}
+
+/* Animace datového toku (ORION Workflow) */
+.workflow-visual {
+    position: relative;
+    width: 100%;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 30px 0 10px 0;
+}
+
+.node {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(3, 7, 18, 0.8);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    color: var(--text-muted);
+    transition: var(--transition);
+}
+
+.node svg {
+    width: 22px;
+    height: 22px;
+}
+
+.node.active {
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
+    animation: pulseNode 2s infinite;
+}
+
+.connection {
+    height: 2px;
+    width: 60px;
+    background: rgba(255, 255, 255, 0.08);
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.connection::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 40%;
+    background: var(--accent-cyan);
+    box-shadow: 0 0 8px var(--accent-cyan);
+    animation: dataFlow 2s infinite linear;
+}
+
+/* Zpoždění pro druhou spojnici, aby data tekla postupně */
+.conn-2::after {
+    animation-delay: 1s;
+}
+
+@keyframes dataFlow {
+    0% { left: -40%; opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { left: 100%; opacity: 0; }
+}
+
+@keyframes pulseNode {
+    0% { box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.4); }
+    70% { box-shadow: 0 0 0 12px rgba(34, 211, 238, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(34, 211, 238, 0); }
+}
 .premium-layout {
     animation: fadeIn 0.6s ease-out;
 }
