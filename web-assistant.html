@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Web Assistant – Orion</title>
+  <title>Interaktivní Ukázka – Orion AI</title>
+  <meta name="description" content="Vyzkoušejte si, jak Orion zvládá zákaznickou podporu, udržuje kontext a kvalifikuje obchodní poptávky." />
 
   <link rel="stylesheet" href="./assets/css/styles.css" />
 
@@ -12,91 +13,49 @@
   <script src="./assets/js/chat.js" defer></script>
 </head>
 <body>
+
   <div id="siteHeader"></div>
 
-  <main class="container page">
-    <div class="pill">Web assistant • prezentační ukázka</div>
-    <h1>Orion — Web Assistant</h1>
+  <main class="container page premium-layout">
+    
+    <div class="text-center max-w-700 mx-auto mb-20">
+      <div class="pill highlight">Prezentační prostředí</div>
+      <h1>Interaktivní ukázka <span class="blue-gradient-text">Orion AI</span></h1>
+      <p class="muted">
+        Tato stránka slouží jako demonstrace schopností našeho asistenta v simulovaném firemním prostředí. 
+        Otestujte jeho reakce na obvyklé klientské dotazy, schopnost udržet hranice tématu a plynulé navedení k obchodní akci.
+      </p>
+    </div>
 
-    <p class="muted">
-      Tohle je stránka, kterou můžeš posílat klientům. Je postavená tak, aby byla srozumitelná na první pohled:
-      co Orion umí, jak drží hranice, jak probíhá předání poptávky a jak se napojuje na systémy (n8n/webhook).
-    </p>
-
-    <section class="grid2" style="margin-top:16px">
-      <div class="card">
-        <h2>Co Orion umí</h2>
-        <ul class="muted" style="margin-top:8px">
-          <li>odpoví na opakující se dotazy (FAQ) krátce a jasně</li>
-          <li>vede uživatele k dalšímu kroku (kontakt / konzultace)</li>
-          <li>umí „držet téma“ (web/e-shop) – mimo téma vrací zpět</li>
-          <li>sbírá kontext (co přesně chce návštěvník, co je problém)</li>
+    <section class="grid2 mt-20">
+      <div class="card glass-effect">
+        <h2 class="blue-gradient-text" style="font-size: 1.8rem;">Co Orion v této ukázce demonstruje</h2>
+        <ul class="check-list muted mt-10">
+          <li><strong>Okamžité odpovědi na FAQ:</strong> Zkuste se zeptat na ceny, fungování či nasazení asistenta.</li>
+          <li><strong>Strategické vedení dialogu:</strong> Orion neodpovídá zbytečně dlouze. Odpoví věcně a vždy navrhne další logický krok.</li>
+          <li><strong>Udržení profesního kontextu:</strong> Asistent je oborově uzamčen. Zkuste se ho zeptat na nesouvisející téma (např. recept na vaření) a sledujte, jak Vás profesionálně vrátí k byznysu.</li>
+          <li><strong>Kvalifikace leadu:</strong> Sledujte, jak asistent sbírá kontext předtím, než Vás odkáže na kontaktní formulář.</li>
         </ul>
       </div>
 
-      <div class="card">
-        <h2>Co Orion záměrně nedělá</h2>
-        <ul class="muted" style="margin-top:8px">
-          <li>nepouští se do témat mimo web/e-shop scénáře</li>
-          <li>neslibuje věci bez dat (radši položí doplňující otázku)</li>
-          <li>nepředstírá „lidského operátora“ – je to asistent</li>
+      <div class="card glass-effect">
+        <h2 class="blue-gradient-text" style="font-size: 1.8rem;">Co Orion záměrně nedělá</h2>
+        <ul class="check-list muted mt-10" style="list-style: none;">
+          <li style="padding-left: 0;">❌ <strong>Nepředstírá, že je člověk:</strong> Hraje fér a od začátku transparentně vystupuje jako digitální asistent.</li>
+          <li style="padding-left: 0;">❌ <strong>Neslibuje nemožné:</strong> Pokud nemá v databázi přesná data, nehalucinuje. Raději si vyžádá doplňující informace nebo odkáže na živého konzultanta.</li>
+          <li style="padding-left: 0;">❌ <strong>Neztrácí Váš čas:</strong> Odpovědi jsou optimalizované pro rychlé čtení. Žádná zbytečná „omáčka“, jen čistá hodnota.</li>
         </ul>
       </div>
     </section>
 
-    <section style="margin-top:22px">
-      <h2>Hranice tématu a důvěryhodnost</h2>
-      <p class="muted">
-        Demo je schválně omezené. Klient díky tomu vidí, že asistent nezabloudí do nesmyslů.
-        Pokud přijde dotaz mimo téma, Orion:
-        <b>odpoví slušně</b> a hned <b>naváže relevantní otázkou</b> zpět do web/e-shop scénáře.
-      </p>
-
-      <div class="grid3" style="margin-top:12px">
-        <div class="card">
-          <h3>Dotaz</h3>
-          <p class="muted">Uživatel napíše dotaz nebo klikne na quick replies.</p>
-        </div>
-        <div class="card">
-          <h3>Odpověď</h3>
-          <p class="muted">Stručná odpověď + návrh dalšího kroku (např. kontakt).</p>
-        </div>
-        <div class="card">
-          <h3>Předání</h3>
-          <p class="muted">Poptávka → formulář → n8n → e-mail/CRM/handoff.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="card" style="margin-top:18px">
-      <h2>Vyzkoušet live demo</h2>
-      <p class="muted">
-        Klikni na ikonu chatu vpravo dole. V ukázce jsou připravené rychlé volby a můžeš napsat vlastní dotaz.
-      </p>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
-        <a class="btn btn-primary" href="./kontakt.html">Chci konzultaci</a>
-        <a class="btn" href="./jak-to-funguje.html">Jak to funguje</a>
-      </div>
-    </section>
-
-    <section style="margin-top:18px">
-      <h2>Pro koho je nasazení typicky nejvýhodnější</h2>
-      <p class="muted">
-        Hlavně pro weby a e-shopy, které mají návštěvnost a opakující se dotazy. Tam je návratnost nejrychlejší.
-      </p>
-
-      <div class="grid3" style="margin-top:12px">
-        <div class="card">
-          <h3>E-shop podpora</h3>
-          <p class="muted">Doprava/platby, reklamace, dostupnost, základní doporučení a orientace v nabídce.</p>
-        </div>
-        <div class="card">
-          <h3>Lead kvalifikace</h3>
-          <p class="muted">Sbírá vstupní info (co chce, kdy, rozpočet, typ služby) → předá operátorovi.</p>
-        </div>
-        <div class="card">
-          <h3>Směrování</h3>
-          <p class="muted">Když uživatel „tápe“, Orion ho navede na správnou stránku / kontakt.</p>
+    <section class="cta-section section-spacing mt-20 text-center">
+      <div class="card cta-card highlight-border">
+        <h2>Otevřete chatovací rozhraní</h2>
+        <p class="muted max-w-700 mx-auto mt-10 mb-20">
+          Klikněte na ikonu v pravém dolním rohu obrazovky. Připravili jsme pro Vás několik rychlých voleb, ale asistent je plně připraven i na Vaše vlastní, specifické dotazy.
+        </p>
+        <div class="action-buttons">
+          <a class="btn btn-secondary btn-large" href="./kontakt.html">Přeskočit demo a sjednat konzultaci</a>
         </div>
       </div>
     </section>
