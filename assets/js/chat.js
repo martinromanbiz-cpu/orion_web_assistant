@@ -1,26 +1,29 @@
 /**
- * ORION Web Assistant - FINÁLNÍ Chat Logic v3.0
- * Včetně Avatarů, Quick Replies a napojení na n8n
+ * ORION Web Assistant - FINÁLNÍ Chat Logic v3.1
+ * Včetně Avatarů, Quick Replies, napojení na n8n a ochrany proti chybám
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Propojení s config.js
+    // 1. Ochrana konfigurace a paměti
     const cfg = window.ORION_CONFIG || {};
     
-    // Paměť prohlížeče (Session ID)
-    let sessionId = localStorage.getItem('orion_session_id');
-    if (!sessionId) {
-        sessionId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
-        localStorage.setItem('orion_session_id', sessionId);
+    let sessionId = 'default-session';
+    try {
+        sessionId = localStorage.getItem('orion_session_id');
+        if (!sessionId) {
+            sessionId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
+            localStorage.setItem('orion_session_id', sessionId);
+        }
+    } catch (e) {
+        console.warn('LocalStorage není dostupný.');
     }
 
-    // 1. VYTVOŘENÍ CHATOVÉHO ROZHRANÍ
+    // 2. Vytvoření HTML rozhraní
     function initChat() {
         if (document.getElementById('orion-chat-wrapper')) return;
 
         const chatWrapper = document.createElement('div');
         chatWrapper.id = 'orion-chat-wrapper';
-        
         chatWrapper.innerHTML = `
             <div id="orion-chat-fab" class="chat-fab">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
@@ -31,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="status-dot"></span>
                         <strong>Orion Assistant</strong>
                     </div>
-                    <button id="close-chat">&times;</button>
+                    <button id="close-chat" aria-label="Zavřít chat">&times;</button>
                 </div>
                 <div id="chat-messages" class="chat-messages">
                     <div class="message assistant-message">
@@ -42,8 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
                 <form id="chat-form" class="chat-input-area">
-                    <input type="text" id="chat-input" placeholder="Napište zprávu..." autocomplete="off">
-                    <button type="submit">
+                    <input type="text" id="chat-input" placeholder="Napište zprávu..." autocomplete="off" required>
+                    <button type="submit" aria-label="Odeslat">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                     </button>
                 </form>
@@ -55,18 +58,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const windowChat = document.getElementById('orion-chat-window');
         const close = document.getElementById('close-chat');
 
-        fab.addEventListener('click', () => windowChat.classList.toggle('hidden'));
-        close.addEventListener('click', () => windowChat.classList.add('hidden'));
+        if (fab && windowChat && close) {
+            fab.addEventListener('click', () => windowChat.classList.toggle('hidden'));
+            close.addEventListener('click', () => windowChat.classList.add('hidden'));
+        }
     }
 
-    // Inicializace
     initChat();
 
     const chatMessages = document.getElementById('chat-messages');
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
 
-    // 2. VYKRESLOVÁNÍ ZPRÁV A AVATARŮ
+    if (!chatMessages || !chatForm || !chatInput) return;
+
+    // 3. Vykreslování zpráv a avatarů
     function appendMessage(sender, text) {
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${sender}-message`;
@@ -92,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return msgDiv;
     }
 
-    // 3. VYKRESLOVÁNÍ TLAČÍTEK (Quick Replies)
+    // 4. Funkce pro Quick Replies
     function renderQuickReplies(repliesRaw) {
         const oldReplies = document.querySelector('.quick-replies-container');
         if (oldReplies) oldReplies.remove();
@@ -103,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (Array.isArray(replies) && replies.length > 0) {
                 const container = document.createElement('div');
                 container.className = 'quick-replies-container';
+                
                 replies.forEach(text => {
                     const btn = document.createElement('button');
                     btn.className = 'quick-reply-btn';
@@ -113,22 +120,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     };
                     container.appendChild(btn);
                 });
+                
                 chatMessages.appendChild(container);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
         } catch (e) { console.error("Chyba Quick Replies:", e); }
     }
 
-    // 4. KOMUNIKACE S n8n
+    // 5. Komunikace s n8n
     async function handleSendMessage(text) {
         if (!text.trim()) return;
+        
         appendMessage('user', text);
         chatInput.value = '';
         const typingDiv = appendMessage('assistant', '...');
 
         if (!cfg.N8N_WEBHOOK_URL) {
             typingDiv.remove();
-            appendMessage('assistant', 'Systém není správně nakonfigurován (chybí webhook).');
+            appendMessage('assistant', 'Systém není nakonfigurován (chybí webhook).');
             return;
         }
 
@@ -136,10 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(cfg.N8N_WEBHOOK_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chatInput: text,
-                    sessionId: sessionId
-                })
+                body: JSON.stringify({ chatInput: text, sessionId: sessionId })
             });
 
             const data = await response.json();
@@ -153,14 +159,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             typingDiv.remove();
-            appendMessage('assistant', 'Došlo k chybě při komunikaci se serverem.');
+            appendMessage('assistant', 'Došlo k technické chybě při spojení se serverem.');
             console.error("Fetch Error:", error);
         }
     }
 
-    // Zachycení odeslání formuláře
     chatForm.addEventListener('submit', (e) => {
         e.preventDefault();
         handleSendMessage(chatInput.value);
     });
+
+    // Testovací zobrazení tlačítek pro kontrolu frontendu
+    setTimeout(() => {
+        renderQuickReplies('["Sjednat konzultaci", "Kolik to stojí?", "Jak to funguje?"]');
+    }, 1000);
 });
