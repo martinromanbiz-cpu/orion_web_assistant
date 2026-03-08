@@ -1,29 +1,22 @@
 /**
- * ORION Web Assistant - FINÁLNÍ Chat Logic v3.1
- * Včetně Avatarů, Quick Replies, napojení na n8n a ochrany proti chybám
+ * ORION Web Assistant - Chat Logic v4.0 (Bottom Bar Suggestions)
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Ochrana konfigurace a paměti
     const cfg = window.ORION_CONFIG || {};
     
-    let sessionId = 'default-session';
-    try {
-        sessionId = localStorage.getItem('orion_session_id');
-        if (!sessionId) {
-            sessionId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
-            localStorage.setItem('orion_session_id', sessionId);
-        }
-    } catch (e) {
-        console.warn('LocalStorage není dostupný.');
+    let sessionId = localStorage.getItem('orion_session_id');
+    if (!sessionId) {
+        sessionId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
+        localStorage.setItem('orion_session_id', sessionId);
     }
 
-    // 2. Vytvoření HTML rozhraní
     function initChat() {
         if (document.getElementById('orion-chat-wrapper')) return;
 
         const chatWrapper = document.createElement('div');
         chatWrapper.id = 'orion-chat-wrapper';
+        
         chatWrapper.innerHTML = `
             <div id="orion-chat-fab" class="chat-fab">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
@@ -34,8 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="status-dot"></span>
                         <strong>Orion Assistant</strong>
                     </div>
-                    <button id="close-chat" aria-label="Zavřít chat">&times;</button>
+                    <button id="close-chat">&times;</button>
                 </div>
+                
                 <div id="chat-messages" class="chat-messages">
                     <div class="message assistant-message">
                         <div class="chat-avatar assistant-avatar">
@@ -44,9 +38,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="message-content">Dobrý den, jsem Orion AI. Jak Vám mohu pomoci s Vaším webem?</div>
                     </div>
                 </div>
+
+                <div id="chat-suggestions" class="chat-suggestions"></div>
+
                 <form id="chat-form" class="chat-input-area">
-                    <input type="text" id="chat-input" placeholder="Napište zprávu..." autocomplete="off" required>
-                    <button type="submit" aria-label="Odeslat">
+                    <input type="text" id="chat-input" placeholder="Napište zprávu..." autocomplete="off">
+                    <button type="submit">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                     </button>
                 </form>
@@ -69,10 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatMessages = document.getElementById('chat-messages');
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
+    const chatSuggestions = document.getElementById('chat-suggestions');
 
-    if (!chatMessages || !chatForm || !chatInput) return;
-
-    // 3. Vykreslování zpráv a avatarů
+    // Vykreslení zpráv s Avatary
     function appendMessage(sender, text) {
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${sender}-message`;
@@ -98,36 +94,30 @@ document.addEventListener('DOMContentLoaded', () => {
         return msgDiv;
     }
 
-    // 4. Funkce pro Quick Replies
-    function renderQuickReplies(repliesRaw) {
-        const oldReplies = document.querySelector('.quick-replies-container');
-        if (oldReplies) oldReplies.remove();
-        if (!repliesRaw) return;
-
-        try {
-            const replies = typeof repliesRaw === 'string' ? JSON.parse(repliesRaw) : repliesRaw;
-            if (Array.isArray(replies) && replies.length > 0) {
-                const container = document.createElement('div');
-                container.className = 'quick-replies-container';
-                
-                replies.forEach(text => {
-                    const btn = document.createElement('button');
-                    btn.className = 'quick-reply-btn';
-                    btn.textContent = text;
-                    btn.onclick = () => {
-                        handleSendMessage(text);
-                        container.remove();
-                    };
-                    container.appendChild(btn);
-                });
-                
-                chatMessages.appendChild(container);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-        } catch (e) { console.error("Chyba Quick Replies:", e); }
+    // Funkce pro aktualizaci tlačítek ve spodním baru
+    function updateSuggestions(repliesArray) {
+        chatSuggestions.innerHTML = ''; // Vyčistí stará tlačítka
+        
+        if (!repliesArray || repliesArray.length === 0) {
+            chatSuggestions.style.display = 'none';
+            return;
+        }
+        
+        chatSuggestions.style.display = 'flex';
+        repliesArray.forEach(text => {
+            const btn = document.createElement('button');
+            btn.className = 'suggestion-btn';
+            btn.textContent = text;
+            btn.onclick = () => {
+                handleSendMessage(text);
+                // Po kliknutí můžeme tlačítka dočasně skrýt, než přijde odpověď
+                chatSuggestions.style.display = 'none';
+            };
+            chatSuggestions.appendChild(btn);
+        });
     }
 
-    // 5. Komunikace s n8n
+    // Odeslání do n8n
     async function handleSendMessage(text) {
         if (!text.trim()) return;
         
@@ -137,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!cfg.N8N_WEBHOOK_URL) {
             typingDiv.remove();
-            appendMessage('assistant', 'Systém není nakonfigurován (chybí webhook).');
+            appendMessage('assistant', 'Systém není nakonfigurován.');
             return;
         }
 
@@ -154,13 +144,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const aiText = data.output || "Omlouvám se, Orion momentálně neodpovídá.";
             appendMessage('assistant', aiText);
 
+            // Pokud n8n pošle nová tlačítka, nahradíme jimi ty staré v baru
             if (data.kb_quick_replies) {
-                renderQuickReplies(data.kb_quick_replies);
+                const replies = typeof data.kb_quick_replies === 'string' ? JSON.parse(data.kb_quick_replies) : data.kb_quick_replies;
+                updateSuggestions(replies);
             }
         } catch (error) {
             typingDiv.remove();
             appendMessage('assistant', 'Došlo k technické chybě při spojení se serverem.');
-            console.error("Fetch Error:", error);
         }
     }
 
@@ -169,8 +160,12 @@ document.addEventListener('DOMContentLoaded', () => {
         handleSendMessage(chatInput.value);
     });
 
-    // Testovací zobrazení tlačítek pro kontrolu frontendu
-    setTimeout(() => {
-        renderQuickReplies('["Sjednat konzultaci", "Kolik to stojí?", "Jak to funguje?"]');
-    }, 1000);
+    // 5 FIXNÍCH OTÁZEK Z TVÉ DATABÁZE (Zobrazí se po načtení)
+    updateSuggestions([
+        "Kolik to stojí?",
+        "Co asistent umí?",
+        "Dá se to nasadit na náš web?",
+        "Jak dlouho trvá nasazení?",
+        "Mám zájem o konzultaci"
+    ]);
 });
