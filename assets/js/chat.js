@@ -1,14 +1,53 @@
 /**
- * ORION Web Assistant - Chat Logic v2.0
- * Implementace Quick Replies & n8n Integration
+ * ORION Web Assistant - Kompletní Chat Logic v2.1
+ * Zahrnuje: Vytvoření ikony, Logiku chatu, Quick Replies & n8n
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. VYTVOŘENÍ CHATOVÉHO ROZHRANÍ (Pokud neexistuje v HTML)
+    function initChat() {
+        if (document.getElementById('orion-chat-wrapper')) return;
+
+        const chatWrapper = document.createElement('div');
+        chatWrapper.id = 'orion-chat-wrapper';
+        chatWrapper.innerHTML = `
+            <div id="orion-chat-fab" class="chat-fab">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            </div>
+            <div id="orion-chat-window" class="chat-window hidden">
+                <div class="chat-header">
+                    <div class="header-info">
+                        <span class="status-dot"></span>
+                        <strong>Orion Assistant</strong>
+                    </div>
+                    <button id="close-chat">&times;</button>
+                </div>
+                <div id="chat-messages" class="chat-messages"></div>
+                <form id="chat-form" class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="Napište zprávu..." autocomplete="off">
+                    <button type="submit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </form>
+            </div>
+        `;
+        document.body.appendChild(chatWrapper);
+
+        // Toggle otevírání chatu
+        const fab = document.getElementById('orion-chat-fab');
+        const window = document.getElementById('orion-chat-window');
+        const close = document.getElementById('close-chat');
+
+        fab.addEventListener('click', () => window.classList.toggle('hidden'));
+        close.addEventListener('click', () => window.classList.add('hidden'));
+    }
+
+    initChat();
+
     const chatMessages = document.getElementById('chat-messages');
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
 
-    // Funkce pro přidání zprávy do okna
     function appendMessage(sender, text) {
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${sender}-message`;
@@ -18,49 +57,36 @@ document.addEventListener('DOMContentLoaded', () => {
         return msgDiv;
     }
 
-    // Funkce pro vytvoření Quick Replies (Tlačítek)
     function renderQuickReplies(repliesRaw) {
-        // Odstraníme staré bubliny, pokud existují
         const oldReplies = document.querySelector('.quick-replies-container');
         if (oldReplies) oldReplies.remove();
-
         if (!repliesRaw) return;
 
         try {
-            // n8n posílá pole jako string nebo objekt, musíme to ošetřit
             const replies = typeof repliesRaw === 'string' ? JSON.parse(repliesRaw) : repliesRaw;
-            
             if (Array.isArray(replies) && replies.length > 0) {
                 const container = document.createElement('div');
                 container.className = 'quick-replies-container';
-
                 replies.forEach(text => {
                     const btn = document.createElement('button');
                     btn.className = 'quick-reply-btn';
                     btn.textContent = text;
                     btn.onclick = () => {
-                        handleSendMessage(text); // Po kliknutí odešle text jako zprávu
-                        container.remove();      // A zmizí
+                        handleSendMessage(text);
+                        container.remove();
                     };
                     container.appendChild(btn);
                 });
                 chatMessages.appendChild(container);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
-        } catch (e) {
-            console.error("Chyba při parsování Quick Replies:", e);
-        }
+        } catch (e) { console.error("Chyba Quick Replies:", e); }
     }
 
-    // Hlavní funkce pro odeslání zprávy
     async function handleSendMessage(text) {
         if (!text.trim()) return;
-
-        // 1. Zobrazení zprávy uživatele
         appendMessage('user', text);
         chatInput.value = '';
-
-        // 2. Indikátor psaní
         const typingDiv = appendMessage('assistant', '...');
 
         try {
@@ -74,27 +100,20 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const data = await response.json();
-            
-            // 3. Odstranění indikátoru a zobrazení odpovědi
             typingDiv.remove();
             
-            // n8n vrací text v poli "output"
-            const aiText = data.output || "Omlouvám se, spojení bylo přerušeno.";
+            const aiText = data.output || "Omlouvám se, Orion je momentálně zaneprázdněn.";
             appendMessage('assistant', aiText);
 
-            // 4. Vykreslení tlačítek (pokud přišla z n8n)
             if (data.kb_quick_replies) {
                 renderQuickReplies(data.kb_quick_replies);
             }
-
         } catch (error) {
             typingDiv.remove();
-            appendMessage('assistant', 'Chyba připojení k systému Orion.');
-            console.error("n8n Error:", error);
+            appendMessage('assistant', 'Chyba připojení k Orion systému.');
         }
     }
 
-    // Event listenery
     chatForm.addEventListener('submit', (e) => {
         e.preventDefault();
         handleSendMessage(chatInput.value);
