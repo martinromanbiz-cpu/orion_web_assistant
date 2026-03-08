@@ -717,3 +717,42 @@ h3 { font-size: 1.5rem; }
 @media (max-width: 768px) {
     .chat-window { width: 100%; height: 100vh; max-height: 100vh; bottom: 0; right: 0; border-radius: 0; }
 }
+/* ==========================================================================
+   17. FIXNÍ SPODNÍ LIŠTA PRO TLAČÍTKA (SUGGESTIONS BAR)
+   ========================================================================== */
+.chat-suggestions {
+    display: flex;
+    gap: 8px;
+    padding: 12px 15px;
+    background: rgba(3, 7, 18, 0.95);
+    border-top: 1px solid var(--border-color);
+    overflow-x: auto;
+    white-space: nowrap;
+    /* Skrytí posuvníku pro čistý vzhled */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.chat-suggestions::-webkit-scrollbar {
+    display: none;
+}
+
+.suggestion-btn {
+    background: rgba(34, 211, 238, 0.08);
+    border: 1px solid rgba(34, 211, 238, 0.4);
+    color: var(--accent-cyan);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0; /* Zabrání zmačkání tlačítek, pokud je jich hodně */
+}
+
+.suggestion-btn:hover {
+    background: var(--accent-cyan);
+    color: var(--bg-dark);
+    box-shadow: 0 0 12px rgba(34, 211, 238, 0.4);
+    transform: translateY(-2px);
+}
