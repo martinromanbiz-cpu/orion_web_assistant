@@ -650,7 +650,45 @@ h3 { font-size: 1.5rem; }
 
 .message {
     display: flex;
-    max-width: 85%;
+    max-width: 90%;
+    align-items: flex-end; /* Zarovná ikonku kousek dolů vedle bubliny */
+    gap: 10px;
+}
+
+.user-message {
+    align-self: flex-end;
+}
+
+.assistant-message {
+    align-self: flex-start;
+}
+
+/* NOVÉ: Styly pro profilové ikonky (Avatary) */
+.chat-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.chat-avatar svg {
+    width: 16px;
+    height: 16px;
+}
+
+.assistant-avatar {
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+    color: var(--bg-dark);
+    box-shadow: 0 4px 10px rgba(34, 211, 238, 0.2);
+}
+
+.user-avatar {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
 }
 
 .user-message {
