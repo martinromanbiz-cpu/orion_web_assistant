@@ -515,3 +515,36 @@ h3 { font-size: 1.5rem; }
 @media (max-width: 768px) {
     .author-box { flex-direction: column; text-align: center; }
 }
+/* Quick Replies Stylování */
+.quick-replies-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0;
+    justify-content: flex-end; /* Bubliny budou vpravo u zpráv uživatele */
+    animation: fadeIn 0.5s ease;
+}
+
+.quick-reply-btn {
+    background: rgba(34, 211, 238, 0.1);
+    border: 1px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.quick-reply-btn:hover {
+    background: var(--accent-cyan);
+    color: var(--bg-dark);
+    box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);
+    transform: translateY(-2px);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
