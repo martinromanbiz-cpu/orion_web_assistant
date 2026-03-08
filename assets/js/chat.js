@@ -1,12 +1,13 @@
 /**
- * ORION Web Assistant - Kompletní Chat Logic v2.2
- * Oprava inicializace, CSS závislostí a webhooku
+ * ORION Web Assistant - FINÁLNÍ Chat Logic v3.0
+ * Včetně Avatarů, Quick Replies a napojení na n8n
  */
 
 document.addEventListener('DOMContentLoaded', () => {
     // Propojení s config.js
     const cfg = window.ORION_CONFIG || {};
-    // Paměť prohlížeče, aby n8n vědělo, že mluví se stejným člověkem
+    
+    // Paměť prohlížeče (Session ID)
     let sessionId = localStorage.getItem('orion_session_id');
     if (!sessionId) {
         sessionId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
@@ -29,33 +30,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="header-info">
                         <span class="status-dot"></span>
                         <strong>Orion Assistant</strong>
-             function appendMessage(sender, text) {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `message ${sender}-message`;
-        
-        // Ikonka robota
-        const assistantAvatar = `
-            <div class="chat-avatar assistant-avatar">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-            </div>`;
-            
-        // Ikonka uživatele
-        const userAvatar = `
-            <div class="chat-avatar user-avatar">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            </div>`;
-
-        // Poskládání HTML (Robot má ikonku vlevo, uživatel vpravo)
-        if (sender === 'assistant') {
-            msgDiv.innerHTML = `${assistantAvatar}<div class="message-content">${text}</div>`;
-        } else {
-            msgDiv.innerHTML = `<div class="message-content">${text}</div>${userAvatar}`;
-        }
-
-        chatMessages.appendChild(msgDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-        return msgDiv;
-    }
+                    </div>
+                    <button id="close-chat">&times;</button>
+                </div>
+                <div id="chat-messages" class="chat-messages">
+                    <div class="message assistant-message">
+                        <div class="chat-avatar assistant-avatar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                        </div>
+                        <div class="message-content">Dobrý den, jsem Orion AI. Jak Vám mohu pomoci s Vaším webem?</div>
+                    </div>
+                </div>
                 <form id="chat-form" class="chat-input-area">
                     <input type="text" id="chat-input" placeholder="Napište zprávu..." autocomplete="off">
                     <button type="submit">
@@ -74,22 +59,40 @@ document.addEventListener('DOMContentLoaded', () => {
         close.addEventListener('click', () => windowChat.classList.add('hidden'));
     }
 
-    // SPUSŤ FUNKCI! (Tohle předtím chybělo)
+    // Inicializace
     initChat();
 
     const chatMessages = document.getElementById('chat-messages');
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
 
+    // 2. VYKRESLOVÁNÍ ZPRÁV A AVATARŮ
     function appendMessage(sender, text) {
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${sender}-message`;
-        msgDiv.innerHTML = `<div class="message-content">${text}</div>`;
+        
+        const assistantAvatar = `
+            <div class="chat-avatar assistant-avatar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            </div>`;
+            
+        const userAvatar = `
+            <div class="chat-avatar user-avatar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>`;
+
+        if (sender === 'assistant') {
+            msgDiv.innerHTML = `${assistantAvatar}<div class="message-content">${text}</div>`;
+        } else {
+            msgDiv.innerHTML = `<div class="message-content">${text}</div>${userAvatar}`;
+        }
+
         chatMessages.appendChild(msgDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
         return msgDiv;
     }
 
+    // 3. VYKRESLOVÁNÍ TLAČÍTEK (Quick Replies)
     function renderQuickReplies(repliesRaw) {
         const oldReplies = document.querySelector('.quick-replies-container');
         if (oldReplies) oldReplies.remove();
@@ -116,13 +119,13 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) { console.error("Chyba Quick Replies:", e); }
     }
 
+    // 4. KOMUNIKACE S n8n
     async function handleSendMessage(text) {
         if (!text.trim()) return;
         appendMessage('user', text);
         chatInput.value = '';
         const typingDiv = appendMessage('assistant', '...');
 
-        // Zkontrolujeme, jestli máme URL
         if (!cfg.N8N_WEBHOOK_URL) {
             typingDiv.remove();
             appendMessage('assistant', 'Systém není správně nakonfigurován (chybí webhook).');
@@ -150,11 +153,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             typingDiv.remove();
-            appendMessage('assistant', 'Došlo k chybě při komunikaci s mozkem (n8n).');
+            appendMessage('assistant', 'Došlo k chybě při komunikaci se serverem.');
             console.error("Fetch Error:", error);
         }
     }
 
+    // Zachycení odeslání formuláře
     chatForm.addEventListener('submit', (e) => {
         e.preventDefault();
         handleSendMessage(chatInput.value);
