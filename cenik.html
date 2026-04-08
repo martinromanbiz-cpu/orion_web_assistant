@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ceník | Orion AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./assets/css/main.css">
+<script src="./assets/js/config.js"></script>
+<script src="./assets/js/app.js" defer></script>
+</head>
+<body>
+
+<div id="siteHeader"></div>
+
+<!-- PAGE HEADER -->
+<section class="hero" style="min-height: 40vh; padding-bottom: 0;">
+  <div class="hero-glow"></div>
+  <div class="badge"><div class="dot"></div> Investice do růstu</div>
+  <h1>Férové <span class="accent">podmínky</span></h1>
+  <p class="hero-sub" style="margin-bottom: 0;">Žádné skryté poplatky. Platíte pouze za to, co reálně využíváte.</p>
+</section>
+
+<!-- PRICING -->
+<div class="pricing-wrap" id="cenik" style="background: transparent;">
+  <div class="pricing-inner">
+    <div class="pricing-grid" style="margin-top: 0;">
+      <div class="price-card">
+        <div class="price-name">Starter</div>
+        <div class="price-amount">4 900 Kč</div>
+        <div class="price-period">jednorázová instalace + 990 Kč/měsíc</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li><span class="check">✓</span> Chatbot na 1 web</li>
+          <li><span class="check">✓</span> Do 500 konverzací/měsíc</li>
+          <li><span class="check">✓</span> Odpovědi na dotazy zákazníků</li>
+          <li><span class="check">✓</span> Integrace na web (1 hodina)</li>
+          <li><span class="check">✓</span> E-mailová podpora</li>
+        </ul>
+        <a href="kontakt.html" class="btn-price btn-price-outline">Začít</a>
+      </div>
+
+      <div class="price-card featured">
+        <div class="featured-badge">Nejpopulárnější</div>
+        <div class="price-name">Business</div>
+        <div class="price-amount">8 900 Kč</div>
+        <div class="price-period">jednorázová instalace + 1 990 Kč/měsíc</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li><span class="check">✓</span> Chatbot na 1 web</li>
+          <li><span class="check">✓</span> Neomezené konverzace</li>
+          <li><span class="check">✓</span> Napojení na CRM / e-mail</li>
+          <li><span class="check">✓</span> Kvalifikace B2B poptávek</li>
+          <li><span class="check">✓</span> Prioritní podpora</li>
+          <li><span class="check">✓</span> Měsíční optimalizace</li>
+        </ul>
+        <a href="kontakt.html" class="btn-price btn-price-filled">Chci Business</a>
+      </div>
+
+      <div class="price-card">
+        <div class="price-name">Na míru</div>
+        <div class="price-amount">Dohodou</div>
+        <div class="price-period">pro větší projekty a agentury</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li><span class="check">✓</span> Více webů a projektů</li>
+          <li><span class="check">✓</span> Vlastní integrace a API</li>
+          <li><span class="check">✓</span> White-label řešení</li>
+          <li><span class="check">✓</span> SLA garance</li>
+          <li><span class="check">✓</span> Dedikovaný account manager</li>
+        </ul>
+        <a href="kontakt.html" class="btn-price btn-price-outline">Probrat projekt</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="section" id="faq" style="padding-top: 0;">
+  <div class="section-label">Časté otázky</div>
+  <h2 class="section-title">Máte otázky? Máme odpovědi.</h2>
+
+  <div class="faq-list">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Musím mít technické znalosti? <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a"><p>Vůbec ne. Vy mi pošlete podklady o vašem e-shopu a já se postarám o vše ostatní. Na váš web stačí vložit jeden řádek kódu — to zvládne i váš webmaster za 2 minuty.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Jak dlouho trvá zprovoznění? <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a"><p>Standardně 7 pracovních dní od zahájení spolupráce. Většinu času věnuji nastavení a testování aby chatbot odpovídal přesně tak jak chcete.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Co když chatbot nezná odpověď? <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a"><p>Nikdy nevymýšlí. Pokud odpověď nemá v databázi, zdvořile zákazníka přesměruje na vás nebo ho požádá o e-mail pro další kontakt. Transparentnost je základ.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Funguje to na Shoptetu nebo WordPressu? <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a"><p>Ano. Orion funguje na jakémkoliv webu — Shoptet, WordPress, vlastní kód, Webflow. Integrace je jednoduchý kód který zkopírujete na web.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Mohu chatbota kdykoliv zrušit? <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a"><p>Samozřejmě. Měsíční předplatné lze zrušit kdykoliv bez sankcí. Chci aby jste zůstali protože jste spokojeni — ne protože musíte.</p></div>
+    </div>
+  </div>
+</div>
+
+<div id="siteFooter"></div>
+
+<script>
+function toggleFaq(btn) {
+  const item = btn.closest('.faq-item');
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+</script>
+
+</body>
+</html>

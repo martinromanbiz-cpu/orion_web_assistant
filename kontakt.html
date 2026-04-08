@@ -1,92 +1,96 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sjednat Konzultaci – Orion AI</title>
-  <meta name="description" content="Spojte se s námi a zjistěte, jak může umělá inteligence zefektivnit Váš byznys." />
-
-  <link rel="stylesheet" href="./assets/css/styles.css" />
-  <link rel="stylesheet" href="./assets/css/contact.css" />
-
-  <script src="./assets/js/config.js"></script>
-  <script src="./assets/js/app.js" defer></script>
-  <script src="./assets/js/chat.js" defer></script>
-  <script src="./assets/js/contact.js" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kontakt | Orion AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./assets/css/main.css">
+<script src="./assets/js/config.js"></script>
+<script src="./assets/js/app.js" defer></script>
+<script src="./assets/js/contact.js" defer></script>
+<style>
+  .contact-container { max-width: 800px; margin: 0 auto; padding: 4rem 2rem; }
+  .contact-card {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 16px;
+    padding: 3rem;
+  }
+  .form-group { margin-bottom: 1.5rem; }
+  .form-group label { display: block; margin-bottom: 0.5rem; color: var(--text2); font-size: 0.9rem; }
+  .form-control {
+    width: 100%;
+    background: var(--bg3);
+    border: 0.5px solid var(--border2);
+    color: var(--text);
+    padding: 1rem;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+  }
+  .form-control:focus { outline: none; border-color: var(--accent); }
+  textarea.form-control { resize: vertical; min-height: 120px; }
+  #contactSuccess {
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+</style>
 </head>
 <body>
 
-  <div id="siteHeader"></div>
+<div id="siteHeader"></div>
 
-  <main class="container page premium-layout">
-    <div class="text-center max-w-700 mx-auto mb-20">
-      <div class="pill highlight">Nezávazná analýza</div>
-      <h1>Spojte se s <span class="blue-gradient-text">námi</span></h1>
-      <p class="muted">
-        Každá úspěšná automatizace začíná pochopením Vašeho byznysu. Vyplňte stručný formulář a náš systém Váš požadavek bezpečně přenese přímo k našemu analytickému týmu.
-      </p>
+<section class="hero" style="min-height: auto; padding-top: 10rem; padding-bottom: 2rem;">
+  <div class="hero-glow"></div>
+  <div class="badge"><div class="dot"></div> Jsme připraveni</div>
+  <h1>Spojme  <span class="accent">síly</span></h1>
+  <p class="hero-sub" style="margin-bottom: 0;">Domluvte si nazávaznou ukázku. Zjistíme zda vám Orion pomůže a kolik hodin týdně ušetříte.</p>
+</section>
+
+<div class="contact-container">
+  <div class="contact-card">
+    
+    <div id="contactStatus" style="color: #ff6b6b; margin-bottom: 1rem; text-align: center; font-weight: 500;"></div>
+
+    <form id="orionContactForm">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <div class="form-group">
+          <label>Jméno a příjmení *</label>
+          <input type="text" name="name" class="form-control" required placeholder="Jan Novák">
+        </div>
+        <div class="form-group">
+          <label>E-mail *</label>
+          <input type="email" name="email" class="form-control" required placeholder="jan@firma.cz">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Telefon</label>
+        <input type="text" name="phone" class="form-control" placeholder="+420 123 456 789">
+      </div>
+      
+      <div class="form-group">
+        <label>Zpráva (co očekáváte od integrace?) *</label>
+        <textarea name="message" class="form-control" required placeholder="Napište nám něco o vašem e-shopu..."></textarea>
+      </div>
+
+      <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; border: none; cursor: pointer; margin-top: 1rem;">Odeslat poptávku →</button>
+      <p style="color: var(--text3); font-size: 0.8rem; text-align: center; margin-top: 1rem;">Odesláním formuláře souhlasíte se zpracováním osobních údajů.</p>
+    </form>
+
+    <div id="contactSuccess" hidden>
+      <div style="font-size: 3rem; margin-bottom: 1rem;">🤝</div>
+      <h3 style="margin-bottom: 1rem;">Děkujeme za váš zájem</h3>
+      <p style="color: var(--text2); margin-bottom: 2rem;">Vaši zprávu jsme v pořádku přijali. Brzy se vám ozveme zpět.</p>
+      <button id="contactClose" class="btn-secondary" style="border: none; cursor: pointer;">Odeslat další zprávu</button>
     </div>
 
-    <section class="grid2 mt-20 contact-layout">
-      <div class="card glass-effect form-card">
-        <h2 style="font-size: 1.6rem; margin-bottom: 5px;">Zahájit komunikaci</h2>
-        <p class="muted text-sm mb-20">Vaše data jsou přenášena přes zabezpečený n8n webhook.</p>
+  </div>
+</div>
 
-        <form class="contact-form" id="contactForm" novalidate>
-          <div class="form-row">
-            <div class="input-group">
-              <label>Jméno a příjmení <span class="req">*</span></label>
-              <input name="name" type="text" placeholder="Jan Novák" required />
-            </div>
+<div id="siteFooter"></div>
 
-            <div class="input-group">
-              <label>Pracovní E-mail <span class="req">*</span></label>
-              <input name="email" type="email" placeholder="jan.novak@firma.cz" required />
-            </div>
-          </div>
-
-          <div class="input-group full-width">
-            <label>Telefonní číslo (Volitelné)</label>
-            <input name="phone" type="tel" placeholder="+420 123 456 789" />
-          </div>
-
-          <div class="input-group full-width">
-            <label>Specifikace projektu <span class="req">*</span></label>
-            <textarea name="message" rows="5" placeholder="Stručně popište Váš web/e-shop a hlavní proces, který chcete pomocí AI automatizovat..." required></textarea>
-          </div>
-
-          <button class="btn btn-primary btn-large form-submit-btn" type="submit" id="contactSubmit">
-            Odeslat zabezpečenou poptávku
-          </button>
-          <p class="status-msg mt-10" id="contactStatus"></p>
-        </form>
-      </div>
-
-      <div class="info-panel">
-        <div class="card glass-effect mb-20">
-          <h3 class="blue-gradient-text">Co bude následovat?</h3>
-          <ol class="custom-counter muted mt-10">
-            <li><strong>Zpracování:</strong> Váš požadavek je okamžitě zpracován naším routing systémem.</li>
-            <li><strong>Analýza:</strong> Během 24 hodin vyhodnotíme technologickou proveditelnost na Vašem webu.</li>
-            <li><strong>Konzultace:</strong> Spojíme se s Vámi (obvykle přes Google Meet) na 20minutový hovor.</li>
-            <li><strong>Návrh:</strong> Připravíme nezávaznou cenovou nabídku a časový plán nasazení.</li>
-          </ol>
-        </div>
-
-        <div class="card glass-effect text-center">
-          <div class="icon-wrapper mx-auto">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-          </div>
-          <h3>Férový přístup a transparentnost</h3>
-          <p class="muted text-sm mt-10">
-            Fixní ceníky u nás nenajdete. Nechceme, abyste platili za funkce, které nevyužijete. Cenu vždy stanovujeme individuálně na základě složitosti databáze a požadovaného n8n workflow.
-          </p>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <div id="siteFooter"></div>
 </body>
 </html>
